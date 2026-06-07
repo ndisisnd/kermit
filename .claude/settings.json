@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f /tmp/commit_cl_cache ] || { [ -f CHANGELOG.md ] && echo 'CHANGELOG_EXISTS=1' > /tmp/commit_cl_cache || echo 'CHANGELOG_EXISTS=0' > /tmp/commit_cl_cache; }"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f /tmp/commit_cl_cache ] && grep -q 'CHANGELOG_EXISTS=0' /tmp/commit_cl_cache 2>/dev/null; then printf '# Changelog\\n\\nAll notable changes to this project will be documented here.\\n' > CHANGELOG.md && echo 'commit-cl: CHANGELOG.md initialized.'; fi; rm -f /tmp/commit_cl_cache"
+          }
+        ]
+      }
+    ]
+  }
+}
