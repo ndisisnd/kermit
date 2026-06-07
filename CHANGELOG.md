@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented here.
 
+## 2026-06-08
+
+Published kermit as the `kermit-msg` npm package with a Node.js installer script, added MIT license, rewrote the README with npm install instructions and a how-it-works walkthrough, and extended SKILL.md with the changelog init check protocol.
+
+- Added: `package.json` — npm package manifest (`kermit-msg`) with bin entry, file list, and keywords
+- Added: `bin/kermit.js` — Node installer that copies `SKILL.md` and `refs/` into `~/.claude/skills/kermit/`
+- Added: `LICENSE` — MIT license
+- Added: `asset/readme.jpg` — hero image for README
+- Changed: `README.md` — rewritten with npm/npx install path, visual header, and step-by-step how-it-works
+- Changed: `SKILL.md` — adds init check block covering changelog setup, backfill, and pref.json persistence
+- Changed: `.gitignore` — adds `node_modules/` exclusion
+- Added: `pref.json` — root-level preference template
+
 ## 2026-06-07
 
 Added install scripts, a README, and a changelog protocol reference to make kermit distributable and self-documenting.

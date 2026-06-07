@@ -1,0 +1,31 @@
+{
+  "name": "kermit-msg",
+  "version": "1.0.0",
+  "description": "Claude Code skill: Conventional Commits with emoji prefix and CHANGELOG management",
+  "bin": {
+    "kermit-msg": "bin/kermit.js"
+  },
+  "files": [
+    "bin/",
+    "SKILL.md",
+    "refs/"
+  ],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "skill",
+    "git",
+    "commits",
+    "conventional-commits",
+    "changelog"
+  ],
+  "author": "Andy Chan",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andychan/kermit.git"
+  }
+}
