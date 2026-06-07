@@ -62,9 +62,10 @@ If `--init`: `[ -f CHANGELOG.md ] || printf '# Changelog\n\nAll notable changes 
    - Footer (if breaking): `BREAKING CHANGE: <description>` — mandatory for any breaking change, never omit
 
 3. Emit `(3) Proposed commit message:` in a code block. Use `AskUserQuestion` — question: `Approve or revise?`, options: `approve`, `revise`. On revise: use `AskUserQuestion` — question: `What would you like to revise?`, options: `more explicit changes`, `less vague title`, `fix linting / formatting`, `other (I'll describe)`. Incorporate the feedback, rewrite the message, and return to 3.
-4. Use `AskUserQuestion` — question: `(4) Run git commit on your behalf?`, options: `yes`, `no`. On no: terminate — no git, no changelog.
+   After the message is approved, emit: `💡 If you commit this manually or close the session before step 5 completes, run \`/log-it\` afterward to sync the changelog.`
+4. Use `AskUserQuestion` — question: `(4) Run git commit on your behalf?`, options: `yes`, `no`. On no: emit `Tip: if you commit manually later, run \`/log-it\` to update the changelog.` and terminate.
 5. Emit `(5) Updating changelog and committing...`
-   - If `CHANGELOG_EXISTS=1` in cache: append — date header, prose summary, BREAKING note if any, files in order (terse unless large/impactful)
+   - If `CHANGELOG_EXISTS=1` in cache: append — date header, prose summary, BREAKING note if any, files in order (terse unless large/impactful). After writing the changelog, update `.claude/kermit/pref.json`: set `"last_logged_commit"` to the current HEAD SHA (`git log -1 --format="%H"`), preserving all other keys.
    - If `CHANGELOG_EXISTS=0`: Stop hook initializes after session
    Run `$RTK git commit -m "<approved message>"`
 6. Use `AskUserQuestion` — question: `(6) Push to remote?`, options: `yes`, `no`. On yes: run `$RTK git push`.
