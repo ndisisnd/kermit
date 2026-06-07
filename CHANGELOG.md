@@ -4,6 +4,21 @@ All notable changes to this project will be documented here.
 
 ## 2026-06-08
 
+Fixed the GitHub repository URL in `package.json` and updated changelog tracking in `pref.json`.
+
+- Changed: `package.json` — correct repo URL from andychan to ndisisnd
+- Changed: `.claude/kermit/pref.json` — add `last_logged_commit` field for log-it integration
+
+## 2026-06-08
+
+Added the `log-it` skill for syncing the changelog after unlogged or manually committed changes.
+
+- Added: `.claude/skills/log-it/SKILL.md` — the `log-it` skill; detects commits not yet in the changelog by comparing git history against the last logged SHA or date entry, then prompts to write the missing entries
+- Added: `.claude/skills/log-it/refs/changelog-protocol.md` — changelog entry format reference used by `log-it` at runtime
+- Changed: `SKILL.md` — adds `/log-it` reminder tip after message approval and on manual commit exit; writes `last_logged_commit` to `pref.json` after each changelog update
+
+## 2026-06-08
+
 Published kermit as the `kermit-msg` npm package with a Node.js installer script, added MIT license, rewrote the README with npm install instructions and a how-it-works walkthrough, and extended SKILL.md with the changelog init check protocol.
 
 - Added: `package.json` — npm package manifest (`kermit-msg`) with bin entry, file list, and keywords
