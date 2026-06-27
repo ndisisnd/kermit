@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented here.
 
+## 2026-06-28
+
+Added `auto_approve`, `auto_commit`, and `auto_merge` boolean preferences to kermit. During init, three sequential prompts collect the user's automation choices and persist them to `pref.json`. The commit flow now checks these flags and skips the corresponding confirmation prompts when set to `true`.
+
+- Changed: `SKILL.md` — init flow asks three sequential AskUserQuestion calls for automation prefs; steps 3, 4, 6 short-circuit when the corresponding flag is `true`
+- Changed: `pref.json` — add `auto_approve`, `auto_commit`, `auto_merge` fields (null default) to the template
+- Changed: `.claude/kermit/pref.json` — add `auto_approve`, `auto_commit`, `auto_merge` fields to the live pref file
+
 ## 2026-06-08
 
 Fixed the GitHub repository URL in `package.json` and updated changelog tracking in `pref.json`.

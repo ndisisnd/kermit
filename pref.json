@@ -1,5 +1,8 @@
 {
   "initialized": false,
   "init_commit": null,
-  "backfill": null
+  "backfill": null,
+  "auto_approve": null,
+  "auto_commit": null,
+  "auto_merge": null
 }
