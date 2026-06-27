@@ -13,7 +13,7 @@ refs:
 
 **Invoke**: `/kermit [--init]` — "commit this", "make a commit", "commit my changes"
 
-- `--init`: initialize CHANGELOG.md if absent, then exit
+- `--init`: re-run the full init block regardless of prior initialization, then exit
 
 ## Inputs
 
@@ -36,7 +36,7 @@ refs:
 
 Read `.claude/kermit/pref.json`. If the file is absent, create it with `{"initialized":false}`.
 
-If `initialized` is `false`:
+If `initialized` is `false` **or** `--init` was passed:
 1. Use `AskUserQuestion` — question: `Set up your changelog`, options: `Create a new changelog`, `I already have a changelog`.
    - **"Create a new changelog"**: create `CHANGELOG.md` with header `# Changelog\n\nAll notable changes to this project will be documented here.\n`. Emit `Changelog created at CHANGELOG.md.` → proceed to **backfill check** below.
    - **"I already have a changelog"**: search the repo for a changelog file — `find . -maxdepth 3 -iname 'changelog*' -o -iname 'history*' -o -iname 'releases*' 2>/dev/null | grep -v node_modules | head -5`. If a file is found, emit the path and use it — **skip backfill check**, go to step 2. If **no file is found**, use `AskUserQuestion` — question: `No changelog file found. What would you like to do?`, options: `Initialise one for me`, `I'll give you the path`. On **"Initialise one for me"**: create `CHANGELOG.md` as above → proceed to **backfill check**. On **"I'll give you the path"**: prompt the user for the path via `AskUserQuestion` (free-text) — **skip backfill check**, go to step 2.
@@ -52,11 +52,9 @@ If `initialized` is `false`:
    - Use `AskUserQuestion` — question: `Auto-approve commit messages?`, options: `Yes`, `No`. Set `auto_approve` to `true` or `false` accordingly.
    - Use `AskUserQuestion` — question: `Auto-commit after approval?`, options: `Yes`, `No`. Set `auto_commit` to `true` or `false` accordingly.
    - Use `AskUserQuestion` — question: `Auto-push after committing?`, options: `Yes`, `No`. Set `auto_merge` to `true` or `false` accordingly.
-   Write `{"initialized":true,"init_commit":"<sha-or-null>","backfill":"<done|skipped|null>","auto_approve":<bool>,"auto_commit":<bool>,"auto_merge":<bool>}` to `.claude/kermit/pref.json`. END init block — continue to step 1 below.
+   Write `{"initialized":true,"init_commit":"<sha-or-null>","backfill":"<done|skipped|null>","auto_approve":<bool>,"auto_commit":<bool>,"auto_merge":<bool>}` to `.claude/kermit/pref.json`. If `--init` was passed: END. Otherwise: END init block — continue to step 1 below.
 
 ---
-
-If `--init`: `[ -f CHANGELOG.md ] || printf '# Changelog\n\nAll notable changes documented here.\n' > CHANGELOG.md`. Emit result. END.
 1. Detect rtk: `which rtk >/dev/null 2>&1 && RTK=rtk || RTK=`. If rtk is absent, `$RTK` is empty and all commands run as plain `git` — no rtk required. Emit `(1) Reading latest git diff...` Run `$RTK git diff --staged`.
 
 2. Emit `(2) Writing commit message...` Produce a Conventional Commits message:

@@ -4,6 +4,13 @@ All notable changes to this project will be documented here.
 
 ## 2026-06-28
 
+Updated `--init` behavior in SKILL.md so it re-runs the full init block rather than just creating a changelog file. Bumped `last_logged_commit` in pref.json to the current HEAD SHA.
+
+- Changed: `SKILL.md` — `--init` now triggers the full init block; removed the old one-liner shortcut path; clarified that `--init` ends after pref write rather than continuing to step 1
+- Changed: `.claude/kermit/pref.json` — update `last_logged_commit` to latest HEAD SHA
+
+---
+
 Added `auto_approve`, `auto_commit`, and `auto_merge` boolean preferences to kermit. During init, three sequential prompts collect the user's automation choices and persist them to `pref.json`. The commit flow now checks these flags and skips the corresponding confirmation prompts when set to `true`.
 
 - Changed: `SKILL.md` — init flow asks three sequential AskUserQuestion calls for automation prefs; steps 3, 4, 6 short-circuit when the corresponding flag is `true`
