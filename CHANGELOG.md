@@ -4,6 +4,13 @@ All notable changes to this project will be documented here.
 
 ## 2026-06-28
 
+Gitignored `pref.json` and removed it from git tracking so local preferences stay out of the repository.
+
+- Changed: `.gitignore` — add `.claude/kermit/pref.json` entry
+- Removed: `.claude/kermit/pref.json` — untracked from git
+
+---
+
 Updated `--init` behavior in SKILL.md so it re-runs the full init block rather than just creating a changelog file. Bumped `last_logged_commit` in pref.json to the current HEAD SHA.
 
 - Changed: `SKILL.md` — `--init` now triggers the full init block; removed the old one-liner shortcut path; clarified that `--init` ends after pref write rather than continuing to step 1
