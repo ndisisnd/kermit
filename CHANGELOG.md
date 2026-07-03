@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here.
 
+## Fix broken manual-install clone URL so the installer actually runs
+
+2026-07-04
+
+- `README.md`: correct the git clone owner from `andychan` to `ndisisnd` in both the macOS/Linux and Windows install blocks, so the clone no longer 404s and the cascade of downstream errors (`cd`, `chmod`, `./install.sh` all failing) is resolved
+
 ## Keep changelog settings together and seed them on install
 
 2026-07-03

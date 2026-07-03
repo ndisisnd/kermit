@@ -29,7 +29,7 @@ kermit-msg
 **macOS / Linux (manual)**
 
 ```bash
-git clone https://github.com/andychan/kermit.git
+git clone https://github.com/ndisisnd/kermit.git
 cd kermit
 chmod +x install.sh
 ./install.sh
@@ -38,7 +38,7 @@ chmod +x install.sh
 **Windows (PowerShell)**
 
 ```powershell
-git clone https://github.com/andychan/kermit.git
+git clone https://github.com/ndisisnd/kermit.git
 cd kermit
 .\install.ps1
 ```
