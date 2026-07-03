@@ -18,5 +18,10 @@ if (fs.existsSync(refsDir)) {
   }
 }
 
+const prefFile = path.join(SRC, 'pref.json');
+if (fs.existsSync(prefFile)) {
+  fs.copyFileSync(prefFile, path.join(DEST, 'pref.json'));
+}
+
 console.log(`kermit installed → ${DEST}`);
 console.log('Use /kermit in any Claude Code session.');

@@ -65,7 +65,7 @@ If `initialized` is `false` **or** `--init` was passed:
    - Use `AskUserQuestion` — question: `Auto-approve commit messages?`, options: `Yes`, `No`. Set `auto_approve` to `true` or `false` accordingly.
    - Use `AskUserQuestion` — question: `Auto-commit after approval?`, options: `Yes`, `No`. Set `auto_commit` to `true` or `false` accordingly.
    - Use `AskUserQuestion` — question: `Auto-push after committing?`, options: `Yes`, `No`. Set `auto_merge` to `true` or `false` accordingly.
-   Write `{"initialized":true,"init_commit":"<sha-or-null>","backfill":"<done|skipped|null>","changelog":{"protocol":<object-or-null>},"auto_approve":<bool>,"auto_commit":<bool>,"auto_merge":<bool>}` to `.claude/kermit/pref.json`. `changelog.protocol` is the object set by the custom protocol sub-flow, or `null` when the default `refs/changelog-protocol.md` applies. If `--init` was passed: END. Otherwise: END init block — continue to step 1 below.
+   Write `{"initialized":true,"init_commit":"<sha-or-null>","backfill":"<done|skipped|null>","changelog":{"path":"<changelog-path-or-null>","protocol":<object-or-null>},"last_logged_commit":null,"auto_approve":<bool>,"auto_commit":<bool>,"auto_merge":<bool>}` to `.claude/kermit/pref.json`. `changelog.path` is the changelog file located or created above (log-it reads it). `changelog.protocol` is the object set by the custom protocol sub-flow, or `null` when the default `refs/changelog-protocol.md` applies. If `--init` was passed: END. Otherwise: END init block — continue to step 1 below.
 
 ---
 1. Detect rtk: `which rtk >/dev/null 2>&1 && RTK=rtk || RTK=`. If rtk is absent, `$RTK` is empty and all commands run as plain `git` — no rtk required. Emit `(1) Reading latest git diff...` Run `$RTK git diff --staged`.

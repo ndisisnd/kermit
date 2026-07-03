@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented here.
 
+## Keep changelog settings together and seed them on install
+
+2026-07-03
+
+- `pref.json`: nest changelog settings under a `changelog` object (`path` + `protocol`); add `last_logged_commit`
+- `SKILL.md`: init write template now records `changelog.path` alongside `changelog.protocol`
+- `install.sh`: copy the `pref.json` template into the installed skill dir
+- `install.ps1`: copy the `pref.json` template into the installed skill dir
+- `bin/kermit.js`: copy the `pref.json` template on npm install
+- `package.json`: add `pref.json` to the published `files` list
+
 ## Let teams write changelogs their own way, with clearer default entries
 
 2026-07-03

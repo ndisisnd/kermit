@@ -14,4 +14,9 @@ if (Test-Path $refsDir) {
     Copy-Item $refsDir "$skillDir\refs" -Recurse -Force
 }
 
+$prefFile = Join-Path $scriptDir "pref.json"
+if (Test-Path $prefFile) {
+    Copy-Item $prefFile "$skillDir\pref.json" -Force
+}
+
 Write-Host "Done. Use /kermit in any Claude Code session."

@@ -13,4 +13,8 @@ if [ -d "${SCRIPT_DIR}/refs" ]; then
   cp -r "${SCRIPT_DIR}/refs" "${SKILL_DIR}/refs"
 fi
 
+if [ -f "${SCRIPT_DIR}/pref.json" ]; then
+  cp "${SCRIPT_DIR}/pref.json" "${SKILL_DIR}/pref.json"
+fi
+
 echo "Done. Use /kermit in any Claude Code session."

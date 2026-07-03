@@ -2,6 +2,11 @@
   "initialized": false,
   "init_commit": null,
   "backfill": null,
+  "changelog": {
+    "path": null,
+    "protocol": null
+  },
+  "last_logged_commit": null,
   "auto_approve": null,
   "auto_commit": null,
   "auto_merge": null
