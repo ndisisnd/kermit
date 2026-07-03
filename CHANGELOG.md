@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented here.
 
+## Let teams write changelogs their own way, with clearer default entries
+
+2026-07-03
+
+- `refs/changelog-protocol.md`: rewrite the entry format — summary is now a `##` heading stating the product goal (surfacing breaking/large changes), date on its own line, one bullet per touched file with sub-points
+  - replace exemplars with feature, bug-fix+security, and breaking-change samples
+- `.claude/skills/log-it/refs/changelog-protocol.md`: mirror the rewritten protocol
+- `SKILL.md`: add a third init option to customise how the changelog is written (describe-it or interview), persist the format under `changelog.protocol` in pref.json, and read it when writing entries
+- `.claude/skills/log-it/SKILL.md`: read `changelog.path` and `changelog.protocol` from pref.json when locating the file and writing entries
+
 ## 2026-06-28
 
 Gitignored `pref.json` and removed it from git tracking so local preferences stay out of the repository.

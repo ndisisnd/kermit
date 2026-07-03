@@ -37,9 +37,9 @@ Detect rtk: `which rtk >/dev/null 2>&1 && RTK=rtk || RTK=`. All git commands use
 
 ### 2. Find changelog path
 
-Read `.claude/kermit/pref.json` if it exists. Look for a `"changelog"` key — use that path if present.
+Read `.claude/kermit/pref.json` if it exists. Look for `changelog.path` — use that path if present.
 
-If pref.json is absent or has no `"changelog"` key: search with `find . -maxdepth 3 \( -iname 'changelog*' -o -iname 'history*' \) 2>/dev/null | grep -v node_modules | head -1`.
+If pref.json is absent or has no `changelog.path`: search with `find . -maxdepth 3 \( -iname 'changelog*' -o -iname 'history*' \) 2>/dev/null | grep -v node_modules | head -1`.
 
 If no changelog is found after both checks:
 - Use `AskUserQuestion` — question: `No changelog found. What would you like to do?`, options: `Init one now (run /kermit --init)`, `I'll give you the path`, `Cancel`.
@@ -88,14 +88,16 @@ For each commit in the list (oldest-first within each date group):
 
 Group commits by date. For each date group (newest group first in the output):
 
-Write the entry following `refs/changelog-protocol.md`:
+Write the entry following the user's changelog format — if pref.json has a `changelog.protocol` object set (from kermit's custom protocol sub-flow), honour its `summary`/`fields`/`show_files`/`flag_breaking` (or free-text `description`); otherwise use `refs/changelog-protocol.md`:
 ```
-## YYYY-MM-DD
+## <Product objective or goal for this date group — flag any breaking/large change here>
 
-<One-sentence prose summary covering all commits in this date group.>
+YYYY-MM-DD
 
-- <bullet per meaningful change, one line, active voice>
+- `path/to/file`: <what changed in this file>
+  - <sub-point: another distinct change in the same file>
 ```
+The heading is the product goal/outcome (fall back to a technical description only when no goal is clear) and must surface breaking or large changes; one bullet per touched file, with sub-points for multiple changes to the same file.
 
 **Prepend** all new date groups before the first existing `## ` line in `$CHANGELOG`. Use a temporary file and `mv`:
 ```bash
