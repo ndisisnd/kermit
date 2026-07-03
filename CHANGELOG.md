@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented here.
 
+## One-line install — no git clone, just curl the script
+
+2026-07-04
+
+- `install.sh`: fetch `SKILL.md`, `refs/*`, and `pref.json` from raw GitHub when run standalone (`curl … | bash`), falling back to local copies when run from a checkout
+- `install.ps1`: mirror the download/local logic for Windows via `Invoke-WebRequest`
+- `README.md`: replace both `git clone` install blocks with `curl … | bash` (macOS/Linux) and `irm … | iex` (Windows) one-liners
+
 ## Guide users straight into setup after installing
 
 2026-07-04

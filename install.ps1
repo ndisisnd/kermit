@@ -1,23 +1,33 @@
 # Install kermit skill for Claude Code (Windows)
 $ErrorActionPreference = "Stop"
 
+$repoRaw = "https://raw.githubusercontent.com/ndisisnd/kermit/main"
 $skillDir = Join-Path $HOME ".claude\skills\kermit"
+$refs = @("commit-protocol.md", "changelog-protocol.md")
+
+# Resolve a local checkout dir if run from one; when piped via `irm ... | iex` there is none, so download.
 $scriptDir = $PSScriptRoot
+
+# Fetch a repo-relative path to a destination — copy from the local checkout if present, else download.
+function Get-KermitFile($rel, $dest) {
+    $local = if ($scriptDir) { Join-Path $scriptDir $rel } else { $null }
+    if ($local -and (Test-Path $local)) {
+        Copy-Item $local $dest -Force
+    } else {
+        Invoke-WebRequest -Uri "$repoRaw/$($rel -replace '\\','/')" -OutFile $dest -UseBasicParsing
+    }
+}
 
 Write-Host "Installing kermit -> $skillDir"
 
-New-Item -ItemType Directory -Force -Path $skillDir | Out-Null
-Copy-Item "$scriptDir\SKILL.md" "$skillDir\SKILL.md" -Force
+New-Item -ItemType Directory -Force -Path (Join-Path $skillDir "refs") | Out-Null
 
-$refsDir = Join-Path $scriptDir "refs"
-if (Test-Path $refsDir) {
-    Copy-Item $refsDir "$skillDir\refs" -Recurse -Force
+Get-KermitFile "SKILL.md" "$skillDir\SKILL.md"
+foreach ($r in $refs) {
+    Get-KermitFile "refs\$r" "$skillDir\refs\$r"
 }
-
-$prefFile = Join-Path $scriptDir "pref.json"
-if (Test-Path $prefFile) {
-    Copy-Item $prefFile "$skillDir\pref.json" -Force
-}
+# pref.json is a template and optional — skip silently if it can't be fetched.
+try { Get-KermitFile "pref.json" "$skillDir\pref.json" } catch {}
 
 Write-Host "Done. Installed -> $skillDir"
 Write-Host ""

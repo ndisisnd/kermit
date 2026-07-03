@@ -26,24 +26,19 @@ npm install -g kermit-msg
 kermit-msg
 ```
 
-**macOS / Linux (manual)**
+**macOS / Linux (curl)**
 
 ```bash
-git clone https://github.com/ndisisnd/kermit.git
-cd kermit
-chmod +x install.sh
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/ndisisnd/kermit/main/install.sh | bash
 ```
 
 **Windows (PowerShell)**
 
 ```powershell
-git clone https://github.com/ndisisnd/kermit.git
-cd kermit
-.\install.ps1
+irm https://raw.githubusercontent.com/ndisisnd/kermit/main/install.ps1 | iex
 ```
 
-All methods copy `SKILL.md` and `refs/` into `~/.claude/skills/kermit/`.
+All methods install `SKILL.md` and `refs/` into `~/.claude/skills/kermit/`.
 
 ## 🌟 How to use
 
