@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented here.
 
+## Guide users straight into setup after installing
+
+2026-07-04
+
+- `install.sh`: after copying files, print a one-line summary of what kermit does, prompt the user to run `/kermit --init` in any local repo, note they can tailor the installed `SKILL.md`, then a magenta `Thank you JC ❤️`
+- `install.ps1`: mirror the post-install guidance, colouring the thank-you line with `Write-Host -ForegroundColor Magenta`
+- `bin/kermit.js`: mirror the post-install guidance with an ANSI-magenta thank-you line
+- `README.md`: tidy trailing newline in the Requirements section
+
 ## Fix broken manual-install clone URL so the installer actually runs
 
 2026-07-04

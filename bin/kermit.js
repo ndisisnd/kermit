@@ -23,5 +23,12 @@ if (fs.existsSync(prefFile)) {
   fs.copyFileSync(prefFile, path.join(DEST, 'pref.json'));
 }
 
-console.log(`kermit installed → ${DEST}`);
-console.log('Use /kermit in any Claude Code session.');
+console.log(`Done. Installed → ${DEST}`);
+console.log('');
+console.log('kermit formats and runs git commits using Conventional Commits — emoji prefix,');
+console.log('point-form file bodies, BREAKING CHANGE footer — and keeps CHANGELOG.md in sync.');
+console.log('');
+console.log('→ Run "/kermit --init" in any local repo to initialise its preferences.');
+console.log(`→ Tailor kermit to your needs by editing ${DEST}/SKILL.md.`);
+console.log('');
+console.log('\x1b[35mThank you JC ❤️\x1b[0m');

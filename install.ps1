@@ -19,4 +19,12 @@ if (Test-Path $prefFile) {
     Copy-Item $prefFile "$skillDir\pref.json" -Force
 }
 
-Write-Host "Done. Use /kermit in any Claude Code session."
+Write-Host "Done. Installed -> $skillDir"
+Write-Host ""
+Write-Host "kermit formats and runs git commits using Conventional Commits — emoji prefix,"
+Write-Host "point-form file bodies, BREAKING CHANGE footer — and keeps CHANGELOG.md in sync."
+Write-Host ""
+Write-Host '-> Run "/kermit --init" in any local repo to initialise its preferences.'
+Write-Host "-> Tailor kermit to your needs by editing $skillDir\SKILL.md."
+Write-Host ""
+Write-Host "Thank you JC ❤️" -ForegroundColor Magenta
