@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented here.
 
+## Cheaper to run — kermit loads ~70% fewer tokens per commit, and reinstalls stay clean
+
+2026-07-06
+
+- `SKILL.md`: replace the one-time `--init` block with a pointer to `refs/init.md`, so the init protocol only loads on `--init`
+  - drop the inline commit-format restatement (kept solely in step 2) and the inline changelog-format restatement
+  - defer reading `refs/changelog-protocol.md` to step 5, and only when no custom protocol is set
+- `refs/init.md`: Added — full `--init` bootstrap protocol extracted verbatim from SKILL.md
+- `refs/commit-protocol.md`: Removed — the commit format now lives only in SKILL.md step 2
+- `refs/changelog-protocol.md`: trim the redundant writing-rules section and two of three exemplars
+- `.claude/skills/log-it/SKILL.md`: strip the inline changelog format; defer to `refs/changelog-protocol.md`
+- `.claude/skills/log-it/refs/changelog-protocol.md`: sync the trimmed copy (kept byte-identical)
+- `install.sh`: swap `commit-protocol.md` for `init.md` in the ref list; wipe `refs/` before copying so dropped files don't linger
+- `install.ps1`: mirror the ref-list change and the `refs/` prune for Windows
+- `.gitignore`: ignore the local `kermit-v1.md` plan
+
 ## One-line install — no git clone, just curl the script
 
 2026-07-04

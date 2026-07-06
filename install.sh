@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPO_RAW="https://raw.githubusercontent.com/ndisisnd/kermit/main"
 SKILL_DIR="${HOME}/.claude/skills/kermit"
-REFS=("commit-protocol.md" "changelog-protocol.md")
+REFS=("init.md" "changelog-protocol.md")
 
 # Resolve a local checkout dir if this script was run from one (git clone + ./install.sh).
 # When piped through `curl ... | bash` there is no local file, so we download instead.
@@ -23,6 +23,8 @@ fetch() {
 
 echo "Installing kermit → ${SKILL_DIR}"
 
+# Start from a clean refs dir so files dropped in an upgrade don't linger.
+rm -rf "${SKILL_DIR}/refs"
 mkdir -p "${SKILL_DIR}/refs"
 
 fetch "SKILL.md" "${SKILL_DIR}/SKILL.md"

@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 
 $repoRaw = "https://raw.githubusercontent.com/ndisisnd/kermit/main"
 $skillDir = Join-Path $HOME ".claude\skills\kermit"
-$refs = @("commit-protocol.md", "changelog-protocol.md")
+$refs = @("init.md", "changelog-protocol.md")
 
 # Resolve a local checkout dir if run from one; when piped via `irm ... | iex` there is none, so download.
 $scriptDir = $PSScriptRoot
@@ -20,7 +20,10 @@ function Get-KermitFile($rel, $dest) {
 
 Write-Host "Installing kermit -> $skillDir"
 
-New-Item -ItemType Directory -Force -Path (Join-Path $skillDir "refs") | Out-Null
+# Start from a clean refs dir so files dropped in an upgrade don't linger.
+$refsDir = Join-Path $skillDir "refs"
+if (Test-Path $refsDir) { Remove-Item $refsDir -Recurse -Force }
+New-Item -ItemType Directory -Force -Path $refsDir | Out-Null
 
 Get-KermitFile "SKILL.md" "$skillDir\SKILL.md"
 foreach ($r in $refs) {

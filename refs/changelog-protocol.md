@@ -31,16 +31,9 @@ Each changelog entry has exactly three parts:
 
 Labels are optional — prefix a bullet (or sub-point) with one when the category isn't obvious from the text.
 
-### Writing rules
-
-- **Summary heading**: a `##` heading phrased as a product goal or user outcome; fall back to a technical description only when no product goal is clear. Always call out breaking changes and large changes in the heading itself.
-- **Date**: ISO 8601 (`YYYY-MM-DD`) on its own line beneath the heading; latest entry at the top of the file.
-- **Bullets**: one per touched file, starting with the file path, then what changed. Keep each terse; use sub-points for multiple changes to the same file. Skip pure churn (whitespace, comment-only edits) unless it carries meaning.
-- **Breaking changes**: never leave them implicit — the heading flags them and the relevant file bullet spells out the migration.
-
 ---
 
-## Exemplar 1 — Feature release (product-goal summary)
+## Exemplar — Feature release (product-goal summary)
 
 ```markdown
 ## Sign in with Google — no separate password required
@@ -51,29 +44,4 @@ Labels are optional — prefix a bullet (or sub-point) with one when the categor
   - store the session token in an HTTP-only cookie
 - `src/pages/login.tsx`: add the "Sign in with Google" button
 - `src/routes.ts`: redirect `/login` to the dashboard on success instead of a confirmation page
-```
-
-## Exemplar 2 — Bug fix + security patch
-
-```markdown
-## Stop crashes on empty input and close a search-field XSS hole
-
-2026-05-14
-
-- `src/parser.ts`: Fixed — return an empty result instead of panicking on an empty string
-- `src/search/render.ts`: Security — escape HTML entities before rendering results
-- `src/errors.ts`: Changed — include the offending line number in parse errors
-```
-
-## Exemplar 3 — Breaking change
-
-```markdown
-## BREAKING: unify configuration under a single `kermit.json` file
-
-2026-05-02
-
-- `src/config/load.ts`: read config from `kermit.json`; drop support for `.kermitrc`
-  - throw a clear migration error when a legacy `.kermitrc` is detected
-- `README.md`: document the new config file and the migration steps
-- `.gitignore`: ignore local `kermit.json` overrides
 ```
