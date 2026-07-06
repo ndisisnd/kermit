@@ -14,10 +14,17 @@ if (fs.existsSync(refsDir)) {
   const destRefs = path.join(DEST, 'refs');
   // Start from a clean refs dir so files dropped in an upgrade don't linger.
   fs.rmSync(destRefs, { recursive: true, force: true });
-  fs.mkdirSync(destRefs, { recursive: true });
-  for (const file of fs.readdirSync(refsDir)) {
-    fs.copyFileSync(path.join(refsDir, file), path.join(destRefs, file));
-  }
+  // Recurse so subdirs (e.g. refs/workflows/) are shipped, not just top-level files.
+  const copyDir = (src, dest) => {
+    fs.mkdirSync(dest, { recursive: true });
+    for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+      const from = path.join(src, entry.name);
+      const to = path.join(dest, entry.name);
+      if (entry.isDirectory()) copyDir(from, to);
+      else fs.copyFileSync(from, to);
+    }
+  };
+  copyDir(refsDir, destRefs);
 }
 
 const prefFile = path.join(SRC, 'pref.json');

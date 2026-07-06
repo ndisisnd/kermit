@@ -1,0 +1,54 @@
+name: Deploy
+
+# Puts the CURRENT commit live in a named environment. Distinct from Release:
+# no version bump, no publish, and it is repeatable (the same commit can be
+# redeployed). The `environment:` key engages GitHub Environments — protection
+# rules, required reviewers, and deployment history.
+#
+# The deploy command comes from the TARGET repo, resolved in order:
+#   1) a `deploy:<env>` script in package.json
+#   2) the repo/org Actions variable DEPLOY_CMD
+#   3) a no-op echo (safe default — harmless in a repo with nothing to deploy)
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        required: true
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve + run deploy command
+        # DEPLOY_CMD is passed through env (not interpolated into the script) to
+        # avoid shell injection from a repo variable.
+        env:
+          ENV: ${{ inputs.environment }}
+          DEPLOY_CMD: ${{ vars.DEPLOY_CMD }}
+        run: |
+          if node -e "process.exit(require('./package.json').scripts?.['deploy:'+process.env.ENV]?0:1)" 2>/dev/null; then
+            npm run "deploy:$ENV"
+          elif [ -n "$DEPLOY_CMD" ]; then
+            sh -c "$DEPLOY_CMD"
+          else
+            echo "No deploy:$ENV script and no DEPLOY_CMD var — no-op."
+          fi
+
+      # kermit's own repo has no server to deploy to. To publish docs/README to
+      # GitHub Pages instead, uncomment the block below and configure Pages:
+      # - uses: actions/configure-pages@v5
+      # - uses: actions/upload-pages-artifact@v3
+      #   with: { path: . }
+      # - uses: actions/deploy-pages@v4

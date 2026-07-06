@@ -82,28 +82,31 @@ On no: emit `Changelog unchanged. Re-run \`/log-it\` any time to sync.` and exit
 
 ### 5. Write changelog entries
 
-For each commit in the list (oldest-first within each date group):
+**One numbered `## [N]` entry per commit** — do NOT collapse commits into date groups. Each commit gets its own entry (its date shown on its own line under the heading).
+
+For each commit in the list (oldest-first):
 - Run `$RTK git show <SHA> --stat --format="" | head -30` to get changed files.
 - Run `$RTK git show <SHA> -s --format="%s%n%b"` to get subject and body.
 
-Group commits by date. For each date group (newest group first in the output):
+Write each entry following the user's changelog format — if pref.json has a `changelog.protocol` object set (from kermit's custom protocol sub-flow), honour its `summary`/`fields`/`show_files`/`flag_breaking` (or free-text `description`). Only if `changelog.protocol` is `null` (or absent), read `refs/changelog-protocol.md` now and follow it.
 
-Write the entry following the user's changelog format — if pref.json has a `changelog.protocol` object set (from kermit's custom protocol sub-flow), honour its `summary`/`fields`/`show_files`/`flag_breaking` (or free-text `description`). Only if `changelog.protocol` is `null` (or absent), read `refs/changelog-protocol.md` now and follow it.
+**Numbering** (unless a custom `changelog.protocol` sets `"number": false`): resolve the starting number once — `changelog.last_number` from pref, else the highest existing `## [k]` in the file (ignoring `## v…` markers), else 0. Number the commits **oldest→newest** (`start+1 … start+k`), so the newest commit carries the highest `N`.
 
-**Prepend** all new date groups before the first existing `## ` line in `$CHANGELOG`. Use a temporary file and `mv`:
+**Prepend** the new entries — **newest-first** so the top of the file carries the largest `N` — before the first existing `## ` line in `$CHANGELOG`. Use a temporary file and `mv`:
 ```bash
 TMP=$(mktemp)
-printf '%s\n\n' "<new entries block>" > "$TMP"
+printf '%s\n\n' "<new entries block, newest-first>" > "$TMP"
 grep -n "^## " "$CHANGELOG" | head -1   # find insertion line
 # insert before first ## line, or append if none exists
 ```
 
-After writing, emit `Changelog updated — <N> commit(s) logged under <date-list>.`
+After writing, emit `Changelog updated — <k> commit(s) logged as [<start+1>..<start+k>].`
 
 ### 6. Update pref.json
 
-After a successful write, update `.claude/kermit/pref.json`:
+After a successful write, update `.claude/kermit/pref.json` in a single write:
 - Set `"last_logged_commit"` to the SHA of the most recent commit that was just logged (HEAD).
+- Set `changelog.last_number` to the highest `N` written.
 - Preserve all other keys in pref.json.
 
-Emit `pref.json updated — last_logged_commit set to <short-sha>.`
+Emit `pref.json updated — last_logged_commit set to <short-sha>, last_number set to <N>.`

@@ -3,7 +3,8 @@ $ErrorActionPreference = "Stop"
 
 $repoRaw = "https://raw.githubusercontent.com/ndisisnd/kermit/main"
 $skillDir = Join-Path $HOME ".claude\skills\kermit"
-$refs = @("init.md", "changelog-protocol.md")
+$refs = @("init.md", "changelog-protocol.md", "changelog-reset.md")
+$workflowRefs = @("release.yml", "deploy.yml")   # scaffolding templates under refs/workflows/
 
 # Resolve a local checkout dir if run from one; when piped via `irm ... | iex` there is none, so download.
 $scriptDir = $PSScriptRoot
@@ -28,6 +29,12 @@ New-Item -ItemType Directory -Force -Path $refsDir | Out-Null
 Get-KermitFile "SKILL.md" "$skillDir\SKILL.md"
 foreach ($r in $refs) {
     Get-KermitFile "refs\$r" "$skillDir\refs\$r"
+}
+# Workflow scaffolding templates live in the refs\workflows\ subdir.
+$workflowsDir = Join-Path $refsDir "workflows"
+New-Item -ItemType Directory -Force -Path $workflowsDir | Out-Null
+foreach ($w in $workflowRefs) {
+    Get-KermitFile "refs\workflows\$w" "$workflowsDir\$w"
 }
 # pref.json is a template and optional — skip silently if it can't be fetched.
 try { Get-KermitFile "pref.json" "$skillDir\pref.json" } catch {}

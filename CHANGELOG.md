@@ -2,7 +2,26 @@
 
 All notable changes to this project will be documented here.
 
-## Automated releases — CI guards every PR and one click ships kermit to npm
+## [15] — kermit v2: workflow orchestration, numbered changelogs, and a changelog reset
+
+2026-07-06
+
+- `SKILL.md`: add `--release`/`--deploy` flags, a `--changelog-reset` mode check, a `gh` preflight, per-commit `## [N]` numbering in step 5, and a step 7 "trigger a workflow?" gate
+- `refs/changelog-protocol.md`: switch entries to `## [N] — summary` with a Numbering section; note `## v` version markers are unnumbered
+  - `.claude/skills/log-it/refs/changelog-protocol.md`: mirror the format (kept byte-identical)
+- `refs/changelog-reset.md`: Added — protocol to renumber/normalise an existing changelog (backup + diff + approval, idempotent)
+- `refs/init.md`: seed `changelog.last_number`; add a workflow-setup step that can scaffold `release.yml`/`deploy.yml` into a repo
+- `.github/workflows/release.yml`: extract release notes as every entry since the last `## v` marker, insert a version marker on release, add concurrency + an empty-notes guard
+- `.github/workflows/deploy.yml`: Added — environment-gated Deploy workflow; command from the target repo (`deploy:<env>` / `DEPLOY_CMD` / no-op)
+- `refs/workflows/release.yml`, `refs/workflows/deploy.yml`: Added — scaffolding templates shipped for `--init`
+- `.claude/skills/log-it/SKILL.md`: write one numbered entry per commit (no more date grouping)
+- `pref.json`: add `changelog.last_number` and a `workflows` config object
+- `install.sh`, `install.ps1`, `bin/kermit.js`: ship the `refs/workflows/` subdir (recurse in the Node installer)
+- `README.md`: document the flags, numbered changelog, and Releases & Deployments
+- `.gitignore`: ignore `*.bak` (changelog-reset backups)
+- `CHANGELOG.md`: renumber existing entries `[1]`–`[14]` to the new convention
+
+## [14] — Automated releases — CI guards every PR and one click ships kermit to npm
 
 2026-07-06
 
@@ -10,7 +29,7 @@ All notable changes to this project will be documented here.
 - `.github/workflows/release.yml`: Added — manual-dispatch release; bump version, publish to npm with provenance, push commit + tag, and cut a GitHub Release with notes from the top CHANGELOG entry
 - `bin/kermit.js`: wipe the destination `refs/` dir before copying so files dropped in an upgrade don't linger
 
-## Cheaper to run — kermit loads ~70% fewer tokens per commit, and reinstalls stay clean
+## [13] — Cheaper to run — kermit loads ~70% fewer tokens per commit, and reinstalls stay clean
 
 2026-07-06
 
@@ -26,7 +45,7 @@ All notable changes to this project will be documented here.
 - `install.ps1`: mirror the ref-list change and the `refs/` prune for Windows
 - `.gitignore`: ignore the local `kermit-v1.md` plan
 
-## One-line install — no git clone, just curl the script
+## [12] — One-line install — no git clone, just curl the script
 
 2026-07-04
 
@@ -34,7 +53,7 @@ All notable changes to this project will be documented here.
 - `install.ps1`: mirror the download/local logic for Windows via `Invoke-WebRequest`
 - `README.md`: replace both `git clone` install blocks with `curl … | bash` (macOS/Linux) and `irm … | iex` (Windows) one-liners
 
-## Guide users straight into setup after installing
+## [11] — Guide users straight into setup after installing
 
 2026-07-04
 
@@ -43,13 +62,13 @@ All notable changes to this project will be documented here.
 - `bin/kermit.js`: mirror the post-install guidance with an ANSI-magenta thank-you line
 - `README.md`: tidy trailing newline in the Requirements section
 
-## Fix broken manual-install clone URL so the installer actually runs
+## [10] — Fix broken manual-install clone URL so the installer actually runs
 
 2026-07-04
 
 - `README.md`: correct the git clone owner from `andychan` to `ndisisnd` in both the macOS/Linux and Windows install blocks, so the clone no longer 404s and the cascade of downstream errors (`cd`, `chmod`, `./install.sh` all failing) is resolved
 
-## Keep changelog settings together and seed them on install
+## [9] — Keep changelog settings together and seed them on install
 
 2026-07-03
 
@@ -60,7 +79,7 @@ All notable changes to this project will be documented here.
 - `bin/kermit.js`: copy the `pref.json` template on npm install
 - `package.json`: add `pref.json` to the published `files` list
 
-## Let teams write changelogs their own way, with clearer default entries
+## [8] — Let teams write changelogs their own way, with clearer default entries
 
 2026-07-03
 
@@ -70,46 +89,46 @@ All notable changes to this project will be documented here.
 - `SKILL.md`: add a third init option to customise how the changelog is written (describe-it or interview), persist the format under `changelog.protocol` in pref.json, and read it when writing entries
 - `.claude/skills/log-it/SKILL.md`: read `changelog.path` and `changelog.protocol` from pref.json when locating the file and writing entries
 
-## 2026-06-28
+## [7] — Keep local pref.json out of the repository
 
-Gitignored `pref.json` and removed it from git tracking so local preferences stay out of the repository.
+2026-06-28
 
 - Changed: `.gitignore` — add `.claude/kermit/pref.json` entry
 - Removed: `.claude/kermit/pref.json` — untracked from git
 
----
+## [6] — --init re-runs the full init block instead of a one-liner shortcut
 
-Updated `--init` behavior in SKILL.md so it re-runs the full init block rather than just creating a changelog file. Bumped `last_logged_commit` in pref.json to the current HEAD SHA.
+2026-06-28
 
 - Changed: `SKILL.md` — `--init` now triggers the full init block; removed the old one-liner shortcut path; clarified that `--init` ends after pref write rather than continuing to step 1
 - Changed: `.claude/kermit/pref.json` — update `last_logged_commit` to latest HEAD SHA
 
----
+## [5] — Add automation preferences: auto-approve, auto-commit, auto-merge
 
-Added `auto_approve`, `auto_commit`, and `auto_merge` boolean preferences to kermit. During init, three sequential prompts collect the user's automation choices and persist them to `pref.json`. The commit flow now checks these flags and skips the corresponding confirmation prompts when set to `true`.
+2026-06-28
 
 - Changed: `SKILL.md` — init flow asks three sequential AskUserQuestion calls for automation prefs; steps 3, 4, 6 short-circuit when the corresponding flag is `true`
 - Changed: `pref.json` — add `auto_approve`, `auto_commit`, `auto_merge` fields (null default) to the template
 - Changed: `.claude/kermit/pref.json` — add `auto_approve`, `auto_commit`, `auto_merge` fields to the live pref file
 
-## 2026-06-08
+## [4] — Fix the GitHub repository URL in package.json
 
-Fixed the GitHub repository URL in `package.json` and updated changelog tracking in `pref.json`.
+2026-06-08
 
 - Changed: `package.json` — correct repo URL from andychan to ndisisnd
 - Changed: `.claude/kermit/pref.json` — add `last_logged_commit` field for log-it integration
 
-## 2026-06-08
+## [3] — Add the log-it skill to sync missed changelog entries
 
-Added the `log-it` skill for syncing the changelog after unlogged or manually committed changes.
+2026-06-08
 
 - Added: `.claude/skills/log-it/SKILL.md` — the `log-it` skill; detects commits not yet in the changelog by comparing git history against the last logged SHA or date entry, then prompts to write the missing entries
 - Added: `.claude/skills/log-it/refs/changelog-protocol.md` — changelog entry format reference used by `log-it` at runtime
 - Changed: `SKILL.md` — adds `/log-it` reminder tip after message approval and on manual commit exit; writes `last_logged_commit` to `pref.json` after each changelog update
 
-## 2026-06-08
+## [2] — Publish kermit as the kermit-msg npm package
 
-Published kermit as the `kermit-msg` npm package with a Node.js installer script, added MIT license, rewrote the README with npm install instructions and a how-it-works walkthrough, and extended SKILL.md with the changelog init check protocol.
+2026-06-08
 
 - Added: `package.json` — npm package manifest (`kermit-msg`) with bin entry, file list, and keywords
 - Added: `bin/kermit.js` — Node installer that copies `SKILL.md` and `refs/` into `~/.claude/skills/kermit/`
@@ -120,9 +139,9 @@ Published kermit as the `kermit-msg` npm package with a Node.js installer script
 - Changed: `.gitignore` — adds `node_modules/` exclusion
 - Added: `pref.json` — root-level preference template
 
-## 2026-06-07
+## [1] — Make kermit distributable with install scripts and docs
 
-Added install scripts, a README, and a changelog protocol reference to make kermit distributable and self-documenting.
+2026-06-07
 
 - Added: `install.sh` (macOS/Linux) and `install.ps1` (Windows) to copy skill files into `~/.claude/skills/kermit/`
 - Added: `README.md` with full install, usage, and requirements docs

@@ -3,7 +3,8 @@ set -euo pipefail
 
 REPO_RAW="https://raw.githubusercontent.com/ndisisnd/kermit/main"
 SKILL_DIR="${HOME}/.claude/skills/kermit"
-REFS=("init.md" "changelog-protocol.md")
+REFS=("init.md" "changelog-protocol.md" "changelog-reset.md")
+WORKFLOW_REFS=("release.yml" "deploy.yml")   # scaffolding templates under refs/workflows/
 
 # Resolve a local checkout dir if this script was run from one (git clone + ./install.sh).
 # When piped through `curl ... | bash` there is no local file, so we download instead.
@@ -30,6 +31,11 @@ mkdir -p "${SKILL_DIR}/refs"
 fetch "SKILL.md" "${SKILL_DIR}/SKILL.md"
 for r in "${REFS[@]}"; do
   fetch "refs/${r}" "${SKILL_DIR}/refs/${r}"
+done
+# Workflow scaffolding templates live in the refs/workflows/ subdir.
+mkdir -p "${SKILL_DIR}/refs/workflows"
+for w in "${WORKFLOW_REFS[@]}"; do
+  fetch "refs/workflows/${w}" "${SKILL_DIR}/refs/workflows/${w}"
 done
 # pref.json is a template and optional — skip silently if it can't be fetched.
 fetch "pref.json" "${SKILL_DIR}/pref.json" 2>/dev/null || true

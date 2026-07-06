@@ -4,7 +4,15 @@
   "backfill": null,
   "changelog": {
     "path": null,
-    "protocol": null
+    "protocol": null,
+    "last_number": 0
+  },
+  "workflows": {
+    "enabled": false,
+    "release_file": "release.yml",
+    "deploy_file": "deploy.yml",
+    "environments": ["staging", "production"],
+    "auto": "none"
   },
   "last_logged_commit": null,
   "auto_approve": null,
