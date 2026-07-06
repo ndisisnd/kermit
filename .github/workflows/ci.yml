@@ -7,6 +7,19 @@ on:
   pull_request:
   push:
     branches: [main]
+    # Only run when files the checks actually inspect change — skip doc-only
+    # commits (CHANGELOG.md, README.md) that CI has nothing to validate.
+    paths:
+      - 'install.sh'
+      - 'package.json'
+      - 'SKILL.md'
+      - 'refs/**'
+      - '.github/workflows/**'
+
+# Cancel an in-progress run when a newer commit is pushed to the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:

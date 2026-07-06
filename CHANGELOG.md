@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here.
 
+## [17] — Leaner CI: skip doc-only runs and cancel superseded ones
+
+2026-07-06
+
+- `.github/workflows/ci.yml`: add a `paths` filter so CI runs only when `install.sh`, `package.json`, `SKILL.md`, `refs/**`, or the workflows change (doc-only commits no longer trigger it); add `concurrency` to cancel an in-progress run when a newer commit is pushed
+
 ## [16] — Keep AI attribution off your commits
 
 2026-07-06
