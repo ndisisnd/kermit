@@ -35,7 +35,7 @@ If `initialized` is `false` **or** `--init` was passed:
    - Use `AskUserQuestion` — question: `Auto-commit after approval?`, options: `Yes`, `No`. Set `auto_commit` to `true` or `false` accordingly.
    - Use `AskUserQuestion` — question: `Auto-push after committing?`, options: `Yes`, `No`. Set `auto_merge` to `true` or `false` accordingly.
 
-3. **Workflow setup** (Releases & Deployments). Build a `workflows` object, default `{"enabled":false,"release_file":"release.yml","deploy_file":"deploy.yml","environments":["staging","production"],"auto":"none"}`.
+3. **Workflow setup** (Releases & Deployments). Build a `workflows` object, default `{"enabled":false,"release_file":"release.yml","deploy_file":"deploy.yml","environments":["staging","production"],"auto":"none"}`. (When reached standalone via `/kermit --workflows`, run only this step's questions and scaffolding, then merge just the resulting `workflows` object into the existing pref — skip the full-pref write at the end of this step.)
    - Use `AskUserQuestion` — question: `Let kermit trigger Release/Deploy workflows after a commit?`, options: `Yes`, `No`. On `No`: keep `enabled:false` and skip the rest of this step.
    - On `Yes`: set `workflows.enabled` to `true`. Then check for existing workflows: `ls .github/workflows/*.yml 2>/dev/null`.
      - If `release.yml` **and** `deploy.yml` both already exist, skip scaffolding.

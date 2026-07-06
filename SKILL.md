@@ -13,10 +13,11 @@ refs:
 
 ## Usage
 
-**Invoke**: `/kermit [--init] [--changelog-reset] [--release] [--deploy]` — "commit this", "make a commit", "commit my changes"
+**Invoke**: `/kermit [--init] [--changelog-reset] [--workflows] [--release] [--deploy]` — "commit this", "make a commit", "commit my changes"
 
 - `--init`: re-run the full init block regardless of prior initialization, then exit
 - `--changelog-reset [--apply]`: rewrite the existing changelog to the latest conventions (adds `## [N]` numbering, normalises headings/dates/bullets); shows a diff and asks before writing (`--apply` skips the confirm), then exits
+- `--workflows`: (re)run **only** the Release/Deploy workflow setup — enable workflows and scaffold the missing `release.yml`/`deploy.yml` templates — then exit. Use this to turn workflows on later if you declined during `--init`; the normal commit flow never re-prompts for this on its own
 - `--release` / `--deploy`: skip the "Trigger a workflow?" question in step 7 and go straight to a Release (version bump + publish) or a Deploy (put the commit live in an environment). Both dispatch the repo's GitHub Actions workflows via `gh`; both still run the full commit flow first.
 
 ## Inputs
@@ -40,6 +41,15 @@ refs:
 
 **If `--changelog-reset` was passed**: read `refs/changelog-reset.md`, follow it end-to-end,
 then **exit** — do not run the commit flow.
+
+**If `--workflows` was passed**: read `.claude/kermit/pref.json`. If it is absent or
+`initialized` is `false`, fall through to the normal init below instead (the full `--init`
+flow already covers workflow setup). Otherwise read `refs/init.md` and run **only its step 3
+(Workflow setup)** against the existing pref: ask whether to enable Release/Deploy workflows,
+and on `Yes` set `workflows.enabled: true` and offer to scaffold any missing
+`release.yml`/`deploy.yml` templates (never overwrite existing files). Write the resulting
+`workflows` object back into `.claude/kermit/pref.json` in a single merged write, preserving
+all other keys. Then **exit** — do not run the commit flow.
 
 Otherwise, read `.claude/kermit/pref.json`. If the file is absent, create it with
 `{"initialized":false}`. If `initialized` is `false` **or** `--init` was passed:

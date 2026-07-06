@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented here.
 
+## [18] — Turn on Release/Deploy workflows later with `--workflows`
+
+2026-07-06
+
+- `SKILL.md`: add a `--workflows` flag (invoke line + Usage) and a mode-check branch that runs `refs/init.md` step 3 standalone — enable workflows and scaffold missing `release.yml`/`deploy.yml`, merging just the `workflows` object into pref — so you can opt in after declining at `--init`; the commit flow never re-prompts on its own
+- `refs/init.md`: note on step 3 that a standalone `--workflows` run merges only the `workflows` object and skips the full-pref write
+
 ## [17] — Leaner CI: skip doc-only runs and cancel superseded ones
 
 2026-07-06
