@@ -37,6 +37,12 @@ refs:
 
 ## Protocol
 
+**General rule:** batch independent commands into a single Bash call instead of
+separate tool round-trips (step 1 already does this for the rtk check + diff read).
+`.claude/kermit/pref.json` is read once at the mode-check step below — cache its
+values (`gate_mode`, `changelog.*`, `workflows.*`) for the rest of the run rather than
+re-reading the file in later steps.
+
 ### Mode check (runs before everything else)
 
 **If `--changelog-reset` was passed**: read `refs/changelog-reset.md`, follow it end-to-end,
@@ -88,7 +94,7 @@ sets the effective `auto_approve` / `auto_commit` / `auto_merge` values used by 
    After the message is approved, emit: `💡 If you commit this manually or close the session before step 5 completes, run \`/log-it\` afterward to sync the changelog.`
 4. If the resolved `auto_commit` is `true` (see Gate resolution), skip the question and proceed as `yes`. Otherwise use `AskUserQuestion` — question: `(4) Run git commit on your behalf?`, options: `yes`, `no`. On no: emit `Tip: if you commit manually later, run \`/log-it\` to update the changelog.` and terminate.
 5. Emit `(5) Updating changelog and committing...`
-   - If `CHANGELOG_EXISTS=1` in cache: append an entry following the user's changelog format — read `changelog.protocol` from pref.json; if it is an object, honour its `summary`/`fields`/`show_files`/`flag_breaking` (or free-text `description`) when writing the entry. Only if `changelog.protocol` is `null`, read `refs/changelog-protocol.md` now and follow it. **Number the entry** (unless a custom `changelog.protocol` sets `"number": false`): read `changelog.last_number` from pref (if absent, use the highest existing `## [k]` in the file, ignoring `## v…` markers, else 0); let `N = that + 1` and write the heading as `## [N] — <summary>`. kermit commits one at a time, so exactly one numbered entry is written per run. After writing the changelog, update `.claude/kermit/pref.json` in a single write: set `"last_logged_commit"` to the current HEAD SHA (`git log -1 --format="%H"`) **and** `changelog.last_number` to `N`, preserving all other keys.
+   - If `CHANGELOG_EXISTS=1` in cache: append an entry following the user's changelog format — use `changelog.protocol` from the pref.json already read at the mode-check step (do not re-read the file); if it is an object, honour its `summary`/`fields`/`show_files`/`flag_breaking` (or free-text `description`) when writing the entry. Only if `changelog.protocol` is `null`, read `refs/changelog-protocol.md` now and follow it. **Number the entry** (unless a custom `changelog.protocol` sets `"number": false`): use the cached `changelog.last_number` (if absent, use the highest existing `## [k]` in the file, ignoring `## v…` markers, else 0); let `N = that + 1` and write the heading as `## [N] — <summary>`. kermit commits one at a time, so exactly one numbered entry is written per run. After writing the changelog, update `.claude/kermit/pref.json` in a single write: set `"last_logged_commit"` to the current HEAD SHA (`git log -1 --format="%H"`) **and** `changelog.last_number` to `N`, preserving all other keys.
    - If `CHANGELOG_EXISTS=0`: Stop hook initializes after session
    Run `$RTK git commit -m "<approved message>"`
 6. If `push_enabled` is `false` (`commit-only` mode), skip this step and step 7 entirely — the run ends after the commit. Otherwise: if `auto_merge` is `true`, skip the question and proceed as `yes`; else use `AskUserQuestion` — question: `(6) Push to remote?`, options: `yes`, `no`. On yes: run `$RTK git push`.

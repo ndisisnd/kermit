@@ -10,17 +10,11 @@
 
 <br />
 
-
-
 <img src="./asset/readme.jpg">
 
-# ✍🏻 kermit
+<br />
 
-Commit good code, but what about good committing?
-
-Introducing `/kermit` , a Claude skill that uses [Conventional Commits](https://www.conventionalcommits.org/), prefixes with emojis, and manages a changelog automatically via hooks.
-
-Lightweight, easy to use, saves you about ~10s.
+**One command. Intelligent, automated committing.** One-time setup for you to automate commit messages.
 
 </div>
 

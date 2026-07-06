@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented here.
 
+## [20] — Batch pref reads and require reuse across steps
+
+2026-07-06
+
+- `SKILL.md`: add a general protocol rule — batch independent Bash calls into one round trip, and reuse `.claude/kermit/pref.json` values already read at the mode-check step instead of re-reading the file in step 5
+- `README.md`: trim the intro copy to a tighter one-line pitch
+
 ## [19] — Consolidate gate booleans into a single gate_mode
 
 2026-07-06
