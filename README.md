@@ -17,6 +17,8 @@
 
 <br />
 
+<br />
+
 **One command. Intelligent, automated committing.** One-time setup for you to automate commit messages.
 
 </div>
