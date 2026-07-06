@@ -8,7 +8,12 @@
 
 <br />
 
-<img width="360" src="./asset/readme.jpg">
+<img width="240" src="./asset/readme.jpg">
+
+<br />
+<br />
+
+<img width="480" src="./asset/kermit_demo_1.gif">
 
 <br />
 

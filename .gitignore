@@ -5,3 +5,4 @@ node_modules/
 .claude/kermit/pref.json
 *.bak
 improve/
+.DS_Store

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented here.
 
+## [22] — Show kermit in action with a demo GIF in the README
+
+2026-07-06
+
+- `README.md`: embed `asset/kermit_demo_1.gif` demo and resize the readme image to 240px
+- `asset/kermit_demo_1.gif`: add demo animation
+- `.gitignore`: ignore `.DS_Store`
+
 ## [21] — Rewrite README with quickstart and restructured sections
 
 2026-07-06
