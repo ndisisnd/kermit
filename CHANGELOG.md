@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here.
 
+## [21] — Rewrite README with quickstart and restructured sections
+
+2026-07-06
+
+- `README.md`: replace install/usage sections with a "Get started in 30 seconds" flow, reorder docs, add License/Acknowledgements
+
 ## [20] — Batch pref reads and require reuse across steps
 
 2026-07-06

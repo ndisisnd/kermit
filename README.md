@@ -2,15 +2,13 @@
 
 # ✍🏻 kermit
 
-<br />
-
 ### Commit good code, but what about good committing?
 
 <sub>Lightwight opinionated conventional commit style with emoji prefixes, in-built changelog, deployment, release management, and breaking change emission. </sub>
 
 <br />
 
-<img src="./asset/readme.jpg">
+<img width="360" src="./asset/readme.jpg">
 
 <br />
 
@@ -18,54 +16,52 @@
 
 </div>
 
-## ⬇️ Installation
+## ⬇️ Get started in 30 seconds
 
-**npm (recommended)**
-
-```bash
-npx kermit-msg
-```
-
-Or install globally:
-
-```bash
-npm install -g kermit-msg
-kermit-msg
-```
-
-**macOS / Linux (curl)**
+### 1. Install the script
+The script installs the `kermit` skill and its' relevant references.
+**On a macOS / Linux?** Paste this in your terminal:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ndisisnd/kermit/main/install.sh | bash
 ```
 
-**Windows (PowerShell)**
+**On Windows?** Paste this in your shell:
 
 ```powershell
 irm https://raw.githubusercontent.com/ndisisnd/kermit/main/install.ps1 | iex
 ```
 
-All methods install `SKILL.md` and `refs/` into `~/.claude/skills/kermit/`.
+### 2. Initialise kermit
+`kermit` can be used immediately, but initialising it would make the experience more seamless and personalised to your codebase + repository. Paste ```bash /kermit --init``` in your terminal. Initialising will run a step-by-step protocol that basically:
+
+1. Determines how you want to manage your changelog, personalised to your style
+2. Determines how you want to gate your commits (e.g. auto-commit, auto-approve, or even commit to push immediately)
+3. Sets up Github Workflows
+4. Saves all your preferences in a JSON file that's used by future `/kermit` runs
+
+_If you already have a changelog, `kermit` will ask you to point to the relative path._
+
+## ❓ How does it work?
+
+1. The skill will reads your staged diff. If you didn't stage anything, your LLM might tell you to stage your changes first
+2. Writes a commit message based on the inbuilt protocols
+3. Goes through the gate mode that you've selected
+
+## ✌🏻 Who is this for?
+- You **don't like spending time** thinking about how to write commit messages
+- Your **commit messages would be challenging to write** because of huge code changes
+- You want to make sure **commit messages** are always accurate and representative
+
+## ⚒️ How does `kermit` fit into your harness or workflow?
+- You can ask Claude / Codex / Cursor / LLM of your choice to write `kermit` as a hook or automate it when an agent is done coding
+- Use `kermit`'s changelog as a way to debug and provide context for agents
+
+`kermit` isn't a competitor to other commit messaging skills: it preserves maximum context with minimal token usage for codebase health.
 
 ## 🌟 How to use
 
-In any Claude Code session, invoke the skill:
-
-```
-/kermit
-```
-
-Or describe what you want:
-
-> "commit this", "make a commit", "commit my changes"
-
-### Initialize changelog
-
-Run once per repo to create `CHANGELOG.md`:
-
-```
-/kermit --init
-```
+In any session when you want to commit, just run `/kermit` in the terminal. You can also say it in natural language like _make a commit, commit changes, commt this_ and it'll work.
 
 ### Flags
 
@@ -76,22 +72,13 @@ Run once per repo to create `CHANGELOG.md`:
 | `--release` | After committing, dispatch the **Release** workflow (version bump → npm publish → tag → GitHub Release) via `gh` |
 | `--deploy` | After committing, dispatch the **Deploy** workflow (put the commit live in a chosen environment) via `gh` |
 
-## ✨ How it works
-
-1. Reads your staged diff
-2. Writes a commit message — emoji prefix, Conventional Commits type and scope, short imperative subject, one bullet per changed file in the body, and a `BREAKING CHANGE` footer if needed
-3. Shows you the message and asks to approve or revise. Pick a revision hint (more explicit, less vague, fix linting, etc.) or just describe what you want — it rewrites and comes back
-4. Asks whether to run `git commit` for you. Say no and it stops; you keep the message and commit manually
-5. On commit, appends a numbered entry (`## [N] — summary`) to `CHANGELOG.md` with the date and the files touched — one number per commit, newest at the top
-6. If workflows are enabled, offers to trigger a **Release** or **Deploy** after pushing (see [Releases & Deployments](#-releases--deployments))
-
-### 🔢 Numbered changelog
+### Changelog numbering
 
 Every entry gets a sequential number — `## [1]`, `## [2]`, … — one per commit, with the newest at the top carrying the highest number. A **release** stamps a `## vX.Y.Z — date` marker above the commits it shipped, so the changelog reads on two axes: per-commit numbers and per-release versions.
 
 Bringing an older changelog up to this format? Run `/kermit --changelog-reset` — it numbers and normalises the existing entries in place (after a backup and a diff you approve).
 
-### 🚀 Releases & Deployments
+### Releases & Deployments
 
 If you enable workflows during `--init`, kermit can drive two GitHub Actions workflows after a commit:
 
@@ -100,18 +87,11 @@ If you enable workflows during `--init`, kermit can drive two GitHub Actions wor
 
 kermit doesn't deploy or publish itself — it dispatches the workflows via the GitHub CLI (`gh`). During `--init`, kermit can scaffold both workflow templates into a repo that doesn't have them yet (it never overwrites existing files).
 
-### Changelog management
+## License
 
-The first time you run `/kermit` in a repo, it checks `.claude/kermit/pref.json`. If the skill hasn't been set up yet, it walks you through changelog initialisation before doing anything else.
+[MIT](https://github.com/ndisisnd/kermit?tab=MIT-1-ov-file)
 
-You get two options:
+## Acknowledgements
 
-- **Create a new changelog** — kermit creates `CHANGELOG.md` for you. If the repo already has commits, it asks whether to backfill them as a `## History` section (one `- date — subject` line per commit) or leave the slate clean.
-- **I already have a changelog** — kermit scans the repo for an existing changelog file. If it finds one, it uses it. If it can't find anything, it asks whether to create one or let you provide the path.
-
-The result is stored in `.claude/kermit/pref.json` so the setup prompt never appears again.
-
-## Requirements
-
-- Git
-- (Optional) [rtk](https://github.com/rtk-ai/rtk) for token-optimized git commands. Saves lots of tokens.
+- [rtk](https://github.com/rtk-ai/rtk) for token-optimized git commands. Saves lots of tokens
+- [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for the open-sourced scaffold of commit messages
