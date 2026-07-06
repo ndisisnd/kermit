@@ -54,6 +54,7 @@ Otherwise skip straight to step 1.
    - Blank line
    - Body: `- <file> — <descriptor>` per changed file; keep terse unless the change is large or impactful
    - Footer (if breaking): `BREAKING CHANGE: <description>` — mandatory for any breaking change, never omit
+   - **Never add AI co-authorship or attribution trailers** (e.g. `Co-Authored-By: Claude …`, `Co-Authored-By: <any AI>`, `Generated with …`). The commit is the user's — omit these always, and strip any that appear when revising a message.
 
 3. Emit `(3) Proposed commit message:` in a code block. If `auto_approve` is `true` in pref.json, skip the question and proceed as approved. Otherwise use `AskUserQuestion` — question: `Approve or revise?`, options: `approve`, `revise`. On revise: use `AskUserQuestion` — question: `What would you like to revise?`, options: `more explicit changes`, `less vague title`, `fix linting / formatting`, `other (I'll describe)`. Incorporate the feedback, rewrite the message, and return to 3.
    After the message is approved, emit: `💡 If you commit this manually or close the session before step 5 completes, run \`/log-it\` afterward to sync the changelog.`

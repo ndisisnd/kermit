@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here.
 
+## [16] — Keep AI attribution off your commits
+
+2026-07-06
+
+- `SKILL.md`: step 2 now forbids AI co-authorship/attribution trailers (`Co-Authored-By: <AI>`, `Generated with …`) in commit messages, and strips them on revision
+
 ## [15] — kermit v2: workflow orchestration, numbered changelogs, and a changelog reset
 
 2026-07-06
