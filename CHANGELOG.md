@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented here.
 
+## Automated releases — CI guards every PR and one click ships kermit to npm
+
+2026-07-06
+
+- `.github/workflows/ci.yml`: Added — lint `install.sh` with shellcheck, assert every path in package.json `files` exists, and verify all `refs/*.md` pointers in SKILL.md resolve
+- `.github/workflows/release.yml`: Added — manual-dispatch release; bump version, publish to npm with provenance, push commit + tag, and cut a GitHub Release with notes from the top CHANGELOG entry
+- `bin/kermit.js`: wipe the destination `refs/` dir before copying so files dropped in an upgrade don't linger
+
 ## Cheaper to run — kermit loads ~70% fewer tokens per commit, and reinstalls stay clean
 
 2026-07-06

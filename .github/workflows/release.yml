@@ -1,0 +1,64 @@
+name: Release
+
+# Tier 1 release: you pick when and how big. Manual dispatch → bump version,
+# publish to npm, push the tag, and cut a GitHub Release whose notes come
+# straight from the top entry of CHANGELOG.md (kermit owns the changelog).
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Semver bump for this release
+        type: choice
+        required: true
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # push the version-bump commit + tag, create the Release
+      id-token: write   # npm provenance (supply-chain attestation)
+    steps:
+      - name: Checkout (full history so tags resolve)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version + create tag
+        id: bump
+        run: |
+          npm version ${{ inputs.bump }} -m "🔖 chore(release): %s"
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push commit + tag to main
+        run: git push --follow-tags origin HEAD:main
+
+      - name: Extract latest CHANGELOG entry as release notes
+        run: awk '/^## /{c++} c==1{print} c==2{exit}' CHANGELOG.md > RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.bump.outputs.version }}
+          name: v${{ steps.bump.outputs.version }}
+          body_path: RELEASE_NOTES.md

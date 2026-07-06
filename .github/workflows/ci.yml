@@ -1,0 +1,37 @@
+name: CI
+
+# Lightweight gate: kermit has no test suite, so we lint the installer and make
+# sure the package can't ship a broken skill (dangling ref pointers, missing
+# files listed in package.json).
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Shellcheck the bash installer
+        run: shellcheck install.sh
+
+      - name: Every file in package.json "files" must exist
+        run: |
+          node -e '
+            const p = require("./package.json"), fs = require("fs");
+            let bad = 0;
+            for (const f of p.files) {
+              if (!fs.existsSync(f)) { console.error("missing published path: " + f); bad = 1; }
+            }
+            process.exit(bad);
+          '
+
+      - name: Every refs/ pointer in SKILL.md must resolve
+        run: |
+          missing=0
+          for r in $(grep -oE 'refs/[A-Za-z0-9._-]+\.md' SKILL.md | sort -u); do
+            if [ ! -f "$r" ]; then echo "dangling ref in SKILL.md: $r"; missing=1; fi
+          done
+          exit $missing

@@ -12,6 +12,8 @@ fs.copyFileSync(path.join(SRC, 'SKILL.md'), path.join(DEST, 'SKILL.md'));
 const refsDir = path.join(SRC, 'refs');
 if (fs.existsSync(refsDir)) {
   const destRefs = path.join(DEST, 'refs');
+  // Start from a clean refs dir so files dropped in an upgrade don't linger.
+  fs.rmSync(destRefs, { recursive: true, force: true });
   fs.mkdirSync(destRefs, { recursive: true });
   for (const file of fs.readdirSync(refsDir)) {
     fs.copyFileSync(path.join(refsDir, file), path.join(destRefs, file));
