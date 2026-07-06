@@ -30,10 +30,16 @@ If `initialized` is `false` **or** `--init` was passed:
    - **"No, ignore past commits"**: Set `backfill` to `"skipped"` in pref.json. Emit `Past commits will not appear in the changelog.`
    Either way: record the current HEAD SHA via `git log -1 --format="%H" 2>/dev/null` as `init_commit` in pref.json. Returns empty string on a zero-commit repo — store as `null` in that case.
 
-2. Ask the user their automation preferences sequentially:
-   - Use `AskUserQuestion` — question: `Auto-approve commit messages?`, options: `Yes`, `No`. Set `auto_approve` to `true` or `false` accordingly.
-   - Use `AskUserQuestion` — question: `Auto-commit after approval?`, options: `Yes`, `No`. Set `auto_commit` to `true` or `false` accordingly.
-   - Use `AskUserQuestion` — question: `Auto-push after committing?`, options: `Yes`, `No`. Set `auto_merge` to `true` or `false` accordingly.
+2. Ask the user how many gates each commit run should have. Use `AskUserQuestion` —
+   question: `How much should kermit ask before acting?`, options:
+   - `Full (3 gates)` → `gate_mode = "full"` — approve the message, confirm commit, confirm push.
+   - `Auto (1 gate)` → `gate_mode = "auto"` — approve the message once, then auto-commit and auto-push.
+   - `Flash (0 gates)` → `gate_mode = "flash"` — write, commit and push immediately, no prompts.
+   - `Commit-only (0 gates)` → `gate_mode = "commit-only"` — write and commit immediately, never push.
+
+   Store the chosen `gate_mode` string in pref.json. It is the single source of truth
+   for run gates; SKILL.md's Gate resolution derives the effective
+   `auto_approve` / `auto_commit` / `auto_merge` / `push_enabled` values from it.
 
 3. **Workflow setup** (Releases & Deployments). Build a `workflows` object, default `{"enabled":false,"release_file":"release.yml","deploy_file":"deploy.yml","environments":["staging","production"],"auto":"none"}`. (When reached standalone via `/kermit --workflows`, run only this step's questions and scaffolding, then merge just the resulting `workflows` object into the existing pref — skip the full-pref write at the end of this step.)
    - Use `AskUserQuestion` — question: `Let kermit trigger Release/Deploy workflows after a commit?`, options: `Yes`, `No`. On `No`: keep `enabled:false` and skip the rest of this step.
@@ -41,4 +47,4 @@ If `initialized` is `false` **or** `--init` was passed:
      - If `release.yml` **and** `deploy.yml` both already exist, skip scaffolding.
      - Otherwise use `AskUserQuestion` — question: `Add the missing Release/Deploy workflow templates to this repo?`, options: `Yes`, `No`. On `Yes`: for each of `release.yml` / `deploy.yml` that is **absent** in `.github/workflows/`, copy it from the installed skill's `refs/workflows/<file>` into `.github/workflows/<file>` (`mkdir -p .github/workflows` first). **Never overwrite an existing file** — skip any that are present. Emit which files were written.
 
-   Write `{"initialized":true,"init_commit":"<sha-or-null>","backfill":"<done|skipped|null>","changelog":{"path":"<changelog-path-or-null>","protocol":<object-or-null>,"last_number":0},"workflows":<workflows-object>,"last_logged_commit":null,"auto_approve":<bool>,"auto_commit":<bool>,"auto_merge":<bool>}` to `.claude/kermit/pref.json`. `changelog.last_number` seeds the per-commit changelog counter at 0 (first entry becomes `[1]`). `changelog.path` is the changelog file located or created above (log-it reads it). `changelog.protocol` is the object set by the custom protocol sub-flow, or `null` when the default `refs/changelog-protocol.md` applies. `workflows` is the object built in step 3 (defaults to `enabled:false`). If `--init` was passed: END. Otherwise: END init block — return to SKILL.md and continue at step 1.
+   Write `{"initialized":true,"init_commit":"<sha-or-null>","backfill":"<done|skipped|null>","changelog":{"path":"<changelog-path-or-null>","protocol":<object-or-null>,"last_number":0},"workflows":<workflows-object>,"last_logged_commit":null,"gate_mode":"<full|auto|flash|commit-only>"}` to `.claude/kermit/pref.json`. `changelog.last_number` seeds the per-commit changelog counter at 0 (first entry becomes `[1]`). `changelog.path` is the changelog file located or created above (log-it reads it). `changelog.protocol` is the object set by the custom protocol sub-flow, or `null` when the default `refs/changelog-protocol.md` applies. `workflows` is the object built in step 3 (defaults to `enabled:false`). If `--init` was passed: END. Otherwise: END init block — return to SKILL.md and continue at step 1.

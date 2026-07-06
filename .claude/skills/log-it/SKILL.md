@@ -1,7 +1,7 @@
 ---
 name: log-it
 description: Check for git commits not yet reflected in CHANGELOG.md, report the count, and offer to write the missing entries. Companion to kermit — run when a session ends before the changelog was updated.
-model: claude-sonnet-4-6
+model: sonnet
 allowed_tools:
   - Bash
   - AskUserQuestion

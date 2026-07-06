@@ -15,7 +15,5 @@
     "auto": "none"
   },
   "last_logged_commit": null,
-  "auto_approve": null,
-  "auto_commit": null,
-  "auto_merge": null
+  "gate_mode": null
 }

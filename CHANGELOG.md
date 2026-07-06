@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented here.
 
+## [19] — Consolidate gate booleans into a single gate_mode
+
+2026-07-06
+
+- `SKILL.md`: replace `auto_approve`/`auto_commit`/`auto_merge` checks with a `gate_mode`-derived resolution (`full`/`auto`/`flash`/`commit-only`) covering steps 3, 4 and 6, plus a `push_enabled` flag; merge rtk detection into the diff-read step; defer the `gh auth status` check from step 1 to step 7 so it's never paid for on commits that don't trigger a workflow
+- `refs/init.md`: ask one `gate_mode` question during `--init` instead of three separate yes/no prompts
+- `pref.json`: store `gate_mode` instead of the three `auto_*` booleans
+- `.claude/skills/log-it/SKILL.md`: bump model to `sonnet`
+- `.gitignore`: ignore `improve/`
+- `README.md`: add header banner and tagline
+
 ## [18] — Turn on Release/Deploy workflows later with `--workflows`
 
 2026-07-06

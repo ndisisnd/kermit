@@ -4,3 +4,4 @@ kermit-v2.md
 node_modules/
 .claude/kermit/pref.json
 *.bak
+improve/

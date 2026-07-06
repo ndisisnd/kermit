@@ -1,4 +1,17 @@
-<div style="center">
+<div align="center">
+
+# ✍🏻 kermit
+
+<br />
+
+### Commit good code, but what about good committing?
+
+<sub>Lightwight opinionated conventional commit style with emoji prefixes, in-built changelog, deployment, release management, and breaking change emission. </sub>
+
+<br />
+
+
+
 <img src="./asset/readme.jpg">
 
 # ✍🏻 kermit
