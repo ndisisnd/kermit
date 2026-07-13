@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented here.
 
+## [23] — Split the commit flow into its own ref to make room for a PR mode
+
+2026-07-13
+
+- `SKILL.md`: replace the inlined protocol with a two-mode overview and a Protocol dispatch that reads the selected mode's ref; keep the mode-check dispatcher inline; register `refs/protocol-commit.md`
+- `refs/protocol-commit.md`: add — holds the extracted commit protocol (general rule, gate resolution, steps 1–7)
+
 ## [22] — Show kermit in action with a demo GIF in the README
 
 2026-07-06
