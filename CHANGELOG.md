@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented here.
 
+## [24] — Open and update pull requests straight from kermit
+
+2026-07-13
+
+- `refs/protocol-pr.md`: add — the PR protocol; gathers branch state, ensures the branch is pushed, drafts a title and a four-section body (Summary / Why this is being made / Specific changes / Additional information), gates it, then creates or updates the PR via `gh`; reuses `gate_mode` and honours a user-named base branch
+- `SKILL.md`: add the `--pr` flag, route natural-language PR requests ("make a PR", "open a pull request to `<base>`") through it, register the ref, dispatch `--pr` to the PR protocol, and add PR rows to Inputs/Outputs
+- `refs/init.md`: point the end-of-init handoff at the Protocol dispatch (honouring `--pr`) instead of the removed "step 1"
+
 ## [23] — Split the commit flow into its own ref to make room for a PR mode
 
 2026-07-13

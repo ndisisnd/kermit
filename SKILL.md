@@ -8,14 +8,20 @@ allowed_tools:
 refs:
   - refs/init.md
   - refs/protocol-commit.md
+  - refs/protocol-pr.md
   - refs/changelog-protocol.md
   - refs/changelog-reset.md
 ---
 
 ## Usage
 
-**Invoke**: `/kermit [--init] [--changelog-reset] [--workflows] [--release] [--deploy]` — "commit this", "make a commit", "commit my changes"
+**Invoke**: `/kermit [--pr] [--init] [--changelog-reset] [--workflows] [--release] [--deploy]` — "commit this", "make a commit", "commit my changes"
 
+**Natural language routes to a mode — no explicit flag needed:**
+- PR intent → treat as **`--pr`**: "make a PR", "make a pull request", "raise/open a PR", "open a pull request to `<base>`", "PR this branch". If the user names a base branch ("…to `develop`"), use it as the PR base instead of the repo default.
+- Otherwise (commit intent: "commit this", "commit my changes") → the default commit flow.
+
+- `--pr`: run the **PR protocol** instead of the commit flow — open (or update) a GitHub pull request for the current branch via `gh`. Operates on commits already on the branch; does not create a commit. See `refs/protocol-pr.md`
 - `--init`: re-run the full init block regardless of prior initialization, then exit
 - `--changelog-reset [--apply]`: rewrite the existing changelog to the latest conventions (adds `## [N]` numbering, normalises headings/dates/bullets); shows a diff and asks before writing (`--apply` skips the confirm), then exits
 - `--workflows`: (re)run **only** the Release/Deploy workflow setup — enable workflows and scaffold the missing `release.yml`/`deploy.yml` templates — then exit. Use this to turn workflows on later if you declined during `--init`; the normal commit flow never re-prompts for this on its own
@@ -27,6 +33,7 @@ refs:
 |------|--------|--------|
 | staged diff | text | `git diff --staged` (rtk-prefixed if available) |
 | changelog flag | bool | `/tmp/commit_cl_cache` (PreToolUse hook) |
+| branch state (PR mode) | text | `git rev-parse` / `git log $BASE..HEAD` / `gh pr view` |
 
 ## Outputs
 
@@ -35,6 +42,7 @@ refs:
 | commit message | text | shown inline for approval |
 | CHANGELOG.md entry | prose | appended on confirmed commit |
 | git commit / push | shell | run on user confirmation |
+| pull request (PR mode) | shell | created/updated via `gh pr create`/`gh pr edit`, URL shown |
 
 ## Protocol
 
@@ -70,7 +78,8 @@ Otherwise fall through to the protocol dispatch below.
 
 Select the protocol mode and read its ref, then follow it end-to-end:
 
-- Default (commit flow) → read **`refs/protocol-commit.md`** and follow it.
+- `--pr` was passed → read **`refs/protocol-pr.md`** and follow it.
+- Otherwise (default commit flow) → read **`refs/protocol-commit.md`** and follow it.
 
 ---
 
