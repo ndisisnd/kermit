@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented here.
 
+## [26] — Leaner commit and PR protocols — lower per-run token cost, unchanged behavior
+
+2026-07-13
+
+- `refs/protocol-commit.md`: condense the top notes and step-1 rationale; all emitted strings, commands, and gate-table cells preserved
+- `refs/protocol-pr.md`: condense the batch/caching note; behavior unchanged
+
 ## [25] — Leaner kermit SKILL.md — lower per-run token cost, unchanged behavior
 
 2026-07-13

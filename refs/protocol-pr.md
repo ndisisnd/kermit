@@ -4,10 +4,7 @@ Open — or update — a GitHub pull request for the current branch. Reached via
 This mode does **not** produce a commit; it operates on commits that already exist on
 the branch. Run the default commit flow first if you have uncommitted work.
 
-**General rule:** batch independent commands into a single Bash call instead of
-separate tool round-trips (step 1 already does this for the rtk check + branch state).
-`.claude/kermit/pref.json` is read once at the mode-check step (in SKILL.md) — cache its
-values (`gate_mode`, `pr.*`) for the rest of the run rather than re-reading the file.
+**General rule:** batch independent commands into one Bash call (step 1 does this for the rtk check + branch state). `.claude/kermit/pref.json` is read once at mode-check (SKILL.md) — cache `gate_mode`/`pr.*` for the run; don't re-read it.
 
 ## Gate resolution (runs once, before step 1)
 

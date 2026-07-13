@@ -3,11 +3,7 @@
 The default kermit flow: format a Conventional Commits message, gate it, commit,
 optionally push, and optionally trigger a workflow.
 
-**General rule:** batch independent commands into a single Bash call instead of
-separate tool round-trips (step 1 already does this for the rtk check + diff read).
-`.claude/kermit/pref.json` is read once at the mode-check step (in SKILL.md) — cache its
-values (`gate_mode`, `changelog.*`, `workflows.*`) for the rest of the run rather than
-re-reading the file in later steps.
+**General rule:** batch independent commands into one Bash call (step 1 does this for the rtk check + diff read). `.claude/kermit/pref.json` is read once at mode-check (SKILL.md) — cache `gate_mode`/`changelog.*`/`workflows.*` for the run; don't re-read it in later steps.
 
 ## Gate resolution (runs once, before step 1)
 
@@ -23,12 +19,12 @@ sets the effective `auto_approve` / `auto_commit` / `auto_merge` values used by 
 | `commit-only` | true | true | — | **false** | none — commits, never pushes |
 
 **Legacy fallback:** if `gate_mode` is absent (older prefs), use the individual
-`auto_approve` / `auto_commit` / `auto_merge` booleans as they are and treat
-`push_enabled` as `true`. When `push_enabled` is `false` (`commit-only`), **skip steps
-6 and 7 entirely** — do not push, do not ask, do not trigger workflows.
+`auto_approve` / `auto_commit` / `auto_merge` booleans and treat `push_enabled` as
+`true`. When `push_enabled` is `false` (`commit-only`), **skip steps 6 and 7
+entirely** — do not push, do not ask, do not trigger workflows.
 
 ---
-1. Detect rtk **and** read the staged diff in a single Bash call: `which rtk >/dev/null 2>&1 && RTK=rtk || RTK=; echo "(1) Reading latest git diff..."; $RTK git diff --staged`. If rtk is absent, `$RTK` is empty and all commands run as plain `git` — no rtk required. Do **not** check the GitHub CLI here — `gh auth status` makes a network call and is only needed by step 7, so it is deferred to that step (workflows are off on most commits and should never pay for it).
+1. Detect rtk **and** read the staged diff in one Bash call: `which rtk >/dev/null 2>&1 && RTK=rtk || RTK=; echo "(1) Reading latest git diff..."; $RTK git diff --staged`. If rtk is absent, `$RTK` is empty and commands run as plain `git`. Do **not** check the GitHub CLI here — `gh auth status` is a network call deferred to step 7 (workflows are off on most commits).
 
 2. Emit `(2) Writing commit message...` Produce a Conventional Commits message:
    - Line 1: `<emoji> <type>[(<scope>)][!]: <description>` — ≤72 chars total; description is lowercase imperative; `!` and `BREAKING CHANGE` footer are both required for breaking changes. Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Pick an emoji matching the type (e.g. ✨ feat, 🐛 fix, 📝 docs, ♻️ refactor, 🚀 perf, ✅ test, 🔧 chore).
