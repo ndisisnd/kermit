@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here.
 
+## [28] — README now documents opening pull requests with kermit
+
+2026-07-13
+
+- `README.md`: document PR mode — add the `--pr` and `--workflows` rows to the flags table, a dedicated "Pull requests" section, natural-language PR routing, and "pull requests" to the feature tagline
+
 ## [27] — Kermit runs no longer leave a dirty working tree
 
 2026-07-13

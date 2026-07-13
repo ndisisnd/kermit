@@ -4,7 +4,7 @@
 
 ### Commit good code, but what about good committing?
 
-<sub>Lightwight opinionated conventional commit style with emoji prefixes, in-built changelog, deployment, release management, and breaking change emission. </sub>
+<sub>Lightwight opinionated conventional commit style with emoji prefixes, in-built changelog, pull requests, deployment, release management, and breaking change emission. </sub>
 
 <br />
 
@@ -70,12 +70,16 @@ _If you already have a changelog, `kermit` will ask you to point to the relative
 
 In any session when you want to commit, just run `/kermit` in the terminal. You can also say it in natural language like _make a commit, commit changes, commt this_ and it'll work.
 
+The same goes for pull requests — run `/kermit --pr`, or just say _open a PR_, _raise a pull request to `develop`_, and kermit routes to PR mode automatically (naming a base branch sets the PR base).
+
 ### Flags
 
 | Flag | What it does |
 |------|--------------|
+| `--pr` | Open — or update — a GitHub pull request for the current branch via `gh`. Operates on commits already on the branch (it doesn't create a commit), writes a Conventional-Commits title and a structured body, and shows the PR URL |
 | `--init` | Re-run the full setup (changelog + automation + workflow prefs), then exit |
 | `--changelog-reset [--apply]` | Rewrite an existing changelog to the latest conventions — adds `## [N]` numbering and normalises headings/dates/bullets. Backs up to `CHANGELOG.md.bak`, shows a diff, and asks before writing (`--apply` skips the confirm), then exits |
+| `--workflows` | Turn Release/Deploy workflows on later if you declined during `--init` — enables them and scaffolds any missing `release.yml`/`deploy.yml` templates, then exits |
 | `--release` | After committing, dispatch the **Release** workflow (version bump → npm publish → tag → GitHub Release) via `gh` |
 | `--deploy` | After committing, dispatch the **Deploy** workflow (put the commit live in a chosen environment) via `gh` |
 
@@ -84,6 +88,15 @@ In any session when you want to commit, just run `/kermit` in the terminal. You 
 Every entry gets a sequential number — `## [1]`, `## [2]`, … — one per commit, with the newest at the top carrying the highest number. A **release** stamps a `## vX.Y.Z — date` marker above the commits it shipped, so the changelog reads on two axes: per-commit numbers and per-release versions.
 
 Bringing an older changelog up to this format? Run `/kermit --changelog-reset` — it numbers and normalises the existing entries in place (after a backup and a diff you approve).
+
+### Pull requests
+
+`/kermit --pr` opens or updates a GitHub pull request for whatever branch you're on. It works on the commits already on the branch — it doesn't make a commit, so run `/kermit` first if you have uncommitted work. kermit reads the branch state, pushes the branch if needed, and writes:
+
+- a **title** in Conventional Commits style that summarises the branch's overall intent, and
+- a **body** with `## Summary`, `## Why this is being made`, `## Specific changes` (one bullet per distinct change, keyed by module/file), and an optional `## Additional information`.
+
+It defaults the base to your repo's default branch, or the one you name (_"open a PR to `develop`"_). If a PR already exists for the branch, kermit edits it in place instead of opening a duplicate. Approval follows the same gate mode you set during `--init`. Requires the GitHub CLI, authenticated (`gh auth login`).
 
 ### Releases & Deployments
 
