@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here.
 
+## [25] — Leaner kermit SKILL.md — lower per-run token cost, unchanged behavior
+
+2026-07-13
+
+- `SKILL.md`: condense the natural-language routing note, flag bullets, and mode-check prose; all routing/dispatch behavior preserved (verified against the trim benchmark)
+
 ## [24] — Open and update pull requests straight from kermit
 
 2026-07-13
