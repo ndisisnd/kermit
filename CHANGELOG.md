@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented here.
 
+## [29] — README flags reference is easier to scan
+
+2026-07-13
+
+- `README.md`: split the flags reference into "General flags" and "Workflow-related flags" tables, with rows sorted alphabetically
+
 ## [28] — README now documents opening pull requests with kermit
 
 2026-07-13

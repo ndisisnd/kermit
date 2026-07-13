@@ -74,14 +74,21 @@ The same goes for pull requests — run `/kermit --pr`, or just say _open a PR_,
 
 ### Flags
 
+General flags:
+
 | Flag | What it does |
 |------|--------------|
-| `--pr` | Open — or update — a GitHub pull request for the current branch via `gh`. Operates on commits already on the branch (it doesn't create a commit), writes a Conventional-Commits title and a structured body, and shows the PR URL |
-| `--init` | Re-run the full setup (changelog + automation + workflow prefs), then exit |
 | `--changelog-reset [--apply]` | Rewrite an existing changelog to the latest conventions — adds `## [N]` numbering and normalises headings/dates/bullets. Backs up to `CHANGELOG.md.bak`, shows a diff, and asks before writing (`--apply` skips the confirm), then exits |
-| `--workflows` | Turn Release/Deploy workflows on later if you declined during `--init` — enables them and scaffolds any missing `release.yml`/`deploy.yml` templates, then exits |
-| `--release` | After committing, dispatch the **Release** workflow (version bump → npm publish → tag → GitHub Release) via `gh` |
+| `--init` | Re-run the full setup (changelog + automation + workflow prefs), then exit |
+| `--pr` | Open — or update — a GitHub pull request for the current branch via `gh`. Operates on commits already on the branch (it doesn't create a commit), writes a Conventional-Commits title and a structured body, and shows the PR URL |
+
+Workflow-related flags:
+
+| Flag | What it does |
+|------|--------------|
 | `--deploy` | After committing, dispatch the **Deploy** workflow (put the commit live in a chosen environment) via `gh` |
+| `--release` | After committing, dispatch the **Release** workflow (version bump → npm publish → tag → GitHub Release) via `gh` |
+| `--workflows` | Turn Release/Deploy workflows on later if you declined during `--init` — enables them and scaffolds any missing `release.yml`/`deploy.yml` templates, then exits |
 
 ### Changelog numbering
 
