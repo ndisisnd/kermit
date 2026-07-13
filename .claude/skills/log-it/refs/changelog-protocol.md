@@ -10,10 +10,10 @@ Each changelog entry (one per commit) has exactly three parts:
 
 Every entry carries a strictly increasing integer `N`, one per commit, newest entry at the top of the file with the highest `N`. Numbers never reset.
 
-- Get the next number from `changelog.last_number + 1` in `.claude/kermit/pref.json`.
-- If pref is unavailable, derive it from the file: the highest existing `## [k]` heading + 1 (ignore `## v…` version markers — they are not numbered).
+- Get the next number from `last_number + 1` in `.claude/kermit/state.json`.
+- If state is unavailable, derive it from the file: the highest existing `## [k]` heading + 1 (ignore `## v…` version markers — they are not numbered).
 - Starting value is `1` (so `last_number: 0` → first entry is `## [1]`).
-- After writing, set `changelog.last_number` in pref to the highest `N` written.
+- After writing, set `last_number` in `.claude/kermit/state.json` to the highest `N` written.
 
 **Version markers.** A release inserts a `## v<version> — <date>` line (no `[N]`) above the commits it shipped. These are structural separators, not entries — skip them when scanning for the next number.
 

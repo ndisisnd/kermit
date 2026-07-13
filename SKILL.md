@@ -49,15 +49,19 @@ Two protocol modes, each in its own ref:
 - **Commit** (default) — `refs/protocol-commit.md`: format a message, gate it, commit, optionally push and trigger a workflow.
 - **PR** — `refs/protocol-pr.md`: open/update a pull request for the current branch.
 
-`.claude/kermit/pref.json` is read **once** at the mode-check step below — cache its
-values (`gate_mode`, `changelog.*`, `workflows.*`) for the rest of the run rather than
-re-reading the file in later steps.
+kermit keeps two files under `.claude/kermit/`: **`pref.json`** holds stable config
+(`initialized`, `init_commit`, `changelog.*`, `workflows.*`, `gate_mode`) and is safe to
+commit; **`state.json`** holds volatile runtime state (`last_logged_commit`, `last_number`,
+`backfill`) that is rewritten on every commit and must stay git-ignored. Both are read
+**once** at the mode-check step below — cache their values for the rest of the run rather
+than re-reading either file in later steps.
 
 ### Mode check (runs before everything else)
 
 - **`--changelog-reset`** → read `refs/changelog-reset.md`, follow it end-to-end, then **exit** — do not run the commit flow.
 - **`--workflows`** → read `.claude/kermit/pref.json`. If it is absent or `initialized` is `false`, fall through to the normal init below (the full `--init` flow already covers workflow setup). Otherwise read `refs/init.md` and run **only its step 3 (Workflow setup)** against the existing pref: ask whether to enable Release/Deploy workflows, and on `Yes` set `workflows.enabled: true` and offer to scaffold any missing `release.yml`/`deploy.yml` templates (never overwrite existing files). Merge-write the resulting `workflows` object back into `.claude/kermit/pref.json` in a single write, preserving all other keys. Then **exit** — do not run the commit flow.
-- **Otherwise** → read `.claude/kermit/pref.json`. If the file is absent, create it with `{"initialized":false}`. If `initialized` is `false` **or** `--init` was passed: read `refs/init.md` and follow it end-to-end, then continue as it directs. Otherwise fall through to the protocol dispatch below.
+- **Otherwise** → read `.claude/kermit/pref.json` and `.claude/kermit/state.json`. If pref is absent, create it with `{"initialized":false}`. If `initialized` is `false` **or** `--init` was passed: read `refs/init.md` and follow it end-to-end, then continue as it directs. Otherwise fall through to the protocol dispatch below.
+  - **Legacy migration.** Older prefs kept the state fields inside `pref.json`. If `state.json` is absent, create it now — seed `last_logged_commit` from `pref.last_logged_commit`, `last_number` from `pref.changelog.last_number`, and `backfill` from `pref.backfill` (each defaulting to `null`/`0` when the legacy key is missing), then rewrite `pref.json` without those three keys and ensure `.claude/kermit/state.json` is in `.gitignore` (`grep -qxF '.claude/kermit/state.json' .gitignore 2>/dev/null || printf '.claude/kermit/state.json\n' >> .gitignore`). Cache the migrated state for the run.
 
 ### Protocol dispatch
 

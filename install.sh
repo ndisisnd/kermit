@@ -3,7 +3,9 @@ set -euo pipefail
 
 REPO_RAW="https://raw.githubusercontent.com/ndisisnd/kermit/main"
 SKILL_DIR="${HOME}/.claude/skills/kermit"
-REFS=("init.md" "changelog-protocol.md" "changelog-reset.md")
+# Every top-level ref SKILL.md loads. Keep in sync with the repo's refs/ dir — a
+# curl-piped install can't list the repo, so a missing entry ships a broken skill.
+REFS=("init.md" "protocol-commit.md" "protocol-pr.md" "changelog-protocol.md" "changelog-reset.md")
 WORKFLOW_REFS=("release.yml" "deploy.yml")   # scaffolding templates under refs/workflows/
 
 # Resolve a local checkout dir if this script was run from one (git clone + ./install.sh).
@@ -24,8 +26,11 @@ fetch() {
 
 echo "Installing kermit → ${SKILL_DIR}"
 
-# Start from a clean refs dir so files dropped in an upgrade don't linger.
-rm -rf "${SKILL_DIR}/refs"
+# Wipe any previous install so files retired or renamed in an upgrade don't linger
+# (e.g. an old ref, a template dropped from a later version). The skill dir holds only
+# shipped files — the per-repo runtime lives in each project's .claude/kermit/ — so a
+# full wipe is safe and guarantees the install matches this version exactly.
+rm -rf "${SKILL_DIR}"
 mkdir -p "${SKILL_DIR}/refs"
 
 fetch "SKILL.md" "${SKILL_DIR}/SKILL.md"
@@ -37,8 +42,10 @@ mkdir -p "${SKILL_DIR}/refs/workflows"
 for w in "${WORKFLOW_REFS[@]}"; do
   fetch "refs/workflows/${w}" "${SKILL_DIR}/refs/workflows/${w}"
 done
-# pref.json is a template and optional — skip silently if it can't be fetched.
+# pref.json (config) and state.json (volatile runtime state) are templates and
+# optional — skip silently if either can't be fetched.
 fetch "pref.json" "${SKILL_DIR}/pref.json" 2>/dev/null || true
+fetch "state.json" "${SKILL_DIR}/state.json" 2>/dev/null || true
 
 echo "Done. Installed → ${SKILL_DIR}"
 echo

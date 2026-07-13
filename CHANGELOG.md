@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented here.
 
+## [27] — Kermit runs no longer leave a dirty working tree
+
+2026-07-13
+
+- `pref.json`: drop the volatile fields — now stable, committable config only
+- `state.json`: new git-ignored template holding `last_logged_commit`, `last_number`, `backfill`
+- `SKILL.md`: read/cache both files at mode-check; add legacy migration that auto-splits old prefs and git-ignores the state file
+- `refs/protocol-commit.md`: read `last_number` from state; write state after the commit (also fixes `last_logged_commit` recording the previous HEAD)
+- `refs/init.md`: write config and state separately at init; seed `.gitignore` with the state file
+- `refs/changelog-protocol.md`: point numbering at `state.json`
+- `refs/changelog-reset.md`: write `last_number` to `state.json`
+- `.claude/skills/log-it/SKILL.md`: read/write `last_logged_commit` and `last_number` via `state.json`, with legacy fallback
+- `.claude/skills/log-it/refs/changelog-protocol.md`: point numbering at `state.json`
+- `install.sh`: sync the `REFS` list (was missing `protocol-commit.md`/`protocol-pr.md`); wipe the skill dir before reinstall; ship `state.json`
+- `bin/kermit.js`: wipe the whole dest dir before copy; ship `state.json`
+- `.gitignore`: ignore `.claude/kermit/state.json`
+
 ## [26] — Leaner commit and PR protocols — lower per-run token cost, unchanged behavior
 
 2026-07-13

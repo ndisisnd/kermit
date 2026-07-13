@@ -1,11 +1,9 @@
 {
   "initialized": false,
   "init_commit": null,
-  "backfill": null,
   "changelog": {
     "path": null,
-    "protocol": null,
-    "last_number": 0
+    "protocol": null
   },
   "workflows": {
     "enabled": false,
@@ -14,6 +12,5 @@
     "environments": ["staging", "production"],
     "auto": "none"
   },
-  "last_logged_commit": null,
   "gate_mode": null
 }

@@ -54,9 +54,9 @@ To the current `refs/changelog-protocol.md` convention:
 
 Number the commit entries **oldest→newest** as `[1], [2], … [N]` (skip `## v…` markers and,
 unless the user opted in at step 3, the `## History` block), so the **topmost** entry carries
-the highest `N`. Set `changelog.last_number` in `.claude/kermit/pref.json` to that max `N`
-(preserve all other keys). This seeds the counter so the next normal `/kermit` commit
-continues the sequence.
+the highest `N`. Set `last_number` in `.claude/kermit/state.json` to that max `N`
+(preserve all other keys; create the file with `{"last_logged_commit":null,"last_number":<N>,"backfill":null}`
+if it is absent). This seeds the counter so the next normal `/kermit` commit continues the sequence.
 
 Reset works on the entries **as they exist** — it cannot retroactively split a legacy
 multi-file "product goal" heading into per-commit entries (there is no commit mapping), so

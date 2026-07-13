@@ -17,7 +17,8 @@ refs:
 
 | Name | Format | Source |
 |------|--------|--------|
-| pref | JSON | `.claude/kermit/pref.json` (optional — used for changelog path and last-logged SHA) |
+| pref | JSON | `.claude/kermit/pref.json` (optional — used for `changelog.path`) |
+| state | JSON | `.claude/kermit/state.json` (optional, git-ignored — holds `last_logged_commit` and `last_number`) |
 | changelog | file | path from pref, or discovered via `find` |
 | git log | text | `git log <ref>..HEAD` |
 
@@ -27,7 +28,7 @@ refs:
 |------|--------|-------------|
 | unlogged count | text | emitted inline |
 | new changelog entries | prose | prepended to changelog file |
-| pref update | JSON | `.claude/kermit/pref.json` — `last_logged_commit` updated after write |
+| state update | JSON | `.claude/kermit/state.json` — `last_logged_commit` and `last_number` updated after write |
 
 ## Protocol
 
@@ -51,9 +52,9 @@ Store the resolved path as `CHANGELOG`.
 
 ### 3. Determine the commit range
 
-Read pref.json again. If a `"last_logged_commit"` SHA is present, use it as the base: commits = `$RTK git log <last_logged_commit>..HEAD --format="%H %ad %s" --date=short`.
+Read `.claude/kermit/state.json`. If a `"last_logged_commit"` SHA is present, use it as the base: commits = `$RTK git log <last_logged_commit>..HEAD --format="%H %ad %s" --date=short`. (Legacy fallback: if `state.json` is absent but `pref.json` still carries a top-level `last_logged_commit`, use that.)
 
-If `"last_logged_commit"` is absent (kermit hasn't logged yet, or pref.json is missing):
+If `"last_logged_commit"` is absent (kermit hasn't logged yet, or neither file has it):
 - Parse the changelog for the most recent date header: `grep -E "^## [0-9]{4}-[0-9]{2}-[0-9]{2}" "$CHANGELOG" | head -1`
 - Extract the date string (e.g. `2026-06-08`).
 - If a date is found: commits = `$RTK git log --after="<date>" --format="%H %ad %s" --date=short`
@@ -90,7 +91,7 @@ For each commit in the list (oldest-first):
 
 Write each entry following the user's changelog format — if pref.json has a `changelog.protocol` object set (from kermit's custom protocol sub-flow), honour its `summary`/`fields`/`show_files`/`flag_breaking` (or free-text `description`). Only if `changelog.protocol` is `null` (or absent), read `refs/changelog-protocol.md` now and follow it.
 
-**Numbering** (unless a custom `changelog.protocol` sets `"number": false`): resolve the starting number once — `changelog.last_number` from pref, else the highest existing `## [k]` in the file (ignoring `## v…` markers), else 0. Number the commits **oldest→newest** (`start+1 … start+k`), so the newest commit carries the highest `N`.
+**Numbering** (unless a custom `changelog.protocol` sets `"number": false`): resolve the starting number once — `last_number` from `.claude/kermit/state.json`, else the highest existing `## [k]` in the file (ignoring `## v…` markers), else 0. Number the commits **oldest→newest** (`start+1 … start+k`), so the newest commit carries the highest `N`.
 
 **Prepend** the new entries — **newest-first** so the top of the file carries the largest `N` — before the first existing `## ` line in `$CHANGELOG`. Use a temporary file and `mv`:
 ```bash
@@ -102,11 +103,11 @@ grep -n "^## " "$CHANGELOG" | head -1   # find insertion line
 
 After writing, emit `Changelog updated — <k> commit(s) logged as [<start+1>..<start+k>].`
 
-### 6. Update pref.json
+### 6. Update state.json
 
-After a successful write, update `.claude/kermit/pref.json` in a single write:
+After a successful write, update `.claude/kermit/state.json` in a single write (create it with `{"last_logged_commit":null,"last_number":0,"backfill":null}` first if absent, and ensure `.claude/kermit/state.json` is git-ignored — `grep -qxF '.claude/kermit/state.json' .gitignore 2>/dev/null || printf '.claude/kermit/state.json\n' >> .gitignore`):
 - Set `"last_logged_commit"` to the SHA of the most recent commit that was just logged (HEAD).
-- Set `changelog.last_number` to the highest `N` written.
-- Preserve all other keys in pref.json.
+- Set `"last_number"` to the highest `N` written.
+- Preserve all other keys in state.json.
 
-Emit `pref.json updated — last_logged_commit set to <short-sha>, last_number set to <N>.`
+Emit `state.json updated — last_logged_commit set to <short-sha>, last_number set to <N>.`

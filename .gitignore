@@ -3,6 +3,7 @@ kermit-v1.md
 kermit-v2.md
 node_modules/
 .claude/kermit/pref.json
+.claude/kermit/state.json
 *.bak
 improve/
 .DS_Store

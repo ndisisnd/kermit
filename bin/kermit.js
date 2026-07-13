@@ -6,14 +6,16 @@ const os = require('os');
 const SRC = path.join(__dirname, '..');
 const DEST = path.join(os.homedir(), '.claude', 'skills', 'kermit');
 
+// Wipe any previous install so files retired or renamed in an upgrade don't linger.
+// The skill dir holds only shipped files — the per-repo runtime lives in each
+// project's .claude/kermit/ — so a full wipe is safe and matches this version exactly.
+fs.rmSync(DEST, { recursive: true, force: true });
 fs.mkdirSync(DEST, { recursive: true });
 fs.copyFileSync(path.join(SRC, 'SKILL.md'), path.join(DEST, 'SKILL.md'));
 
 const refsDir = path.join(SRC, 'refs');
 if (fs.existsSync(refsDir)) {
   const destRefs = path.join(DEST, 'refs');
-  // Start from a clean refs dir so files dropped in an upgrade don't linger.
-  fs.rmSync(destRefs, { recursive: true, force: true });
   // Recurse so subdirs (e.g. refs/workflows/) are shipped, not just top-level files.
   const copyDir = (src, dest) => {
     fs.mkdirSync(dest, { recursive: true });
@@ -27,9 +29,10 @@ if (fs.existsSync(refsDir)) {
   copyDir(refsDir, destRefs);
 }
 
-const prefFile = path.join(SRC, 'pref.json');
-if (fs.existsSync(prefFile)) {
-  fs.copyFileSync(prefFile, path.join(DEST, 'pref.json'));
+// pref.json (config) and state.json (volatile runtime state) ship as templates.
+for (const tmpl of ['pref.json', 'state.json']) {
+  const src = path.join(SRC, tmpl);
+  if (fs.existsSync(src)) fs.copyFileSync(src, path.join(DEST, tmpl));
 }
 
 console.log(`Done. Installed → ${DEST}`);
