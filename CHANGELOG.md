@@ -4,6 +4,10 @@ All notable changes to this project will be documented here.
 
 ## 2026-07-14
 
+### [33] — Merge reminder no longer misfires on quoted text or wrapped git commands
+
+- `hooks/kermit-merge-guard.sh`: parse the command with a real tokenizer (split on shell operators, treat quoted strings as single tokens) instead of substring matching — so trigger words inside a commit message or an `echo` no longer fire the reminder; tolerate a `rtk`/`sudo`/env wrapper before `git`/`gh`; and fix a macOS bash 3.2 parser error by signalling the verdict through the script's exit code rather than a heredoc inside `$(...)`
+
 ### [32] — Release reminder only fires on real merges to protected branches
 
 - `hooks/kermit-merge-guard.sh`: fire only when a branch merges into `main`/`master`/`production` — a local `git merge` on one of those branches, a `gh pr merge`, or a push with an explicit `:main`/`:master`/`:production` refspec; a plain `git push` (even from a protected branch) no longer triggers the release reminder
