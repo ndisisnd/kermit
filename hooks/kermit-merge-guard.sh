@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 # kermit merge-guard — PreToolUse (Bash) hook.
 #
-# When a Bash command is about to land changes on main/master — a formal release —
-# inject a non-blocking reminder telling kermit to ask the user whether to write
-# release notes (/kermit --release) and to warn them if they decline. Never blocks
-# the command; always exits 0.
+# Fires ONLY when a branch is being MERGED into a protected branch
+# (main / master / production) — a formal release. It injects a non-blocking
+# reminder telling kermit to ask the user whether to write release notes
+# (/kermit --release) and to warn them if they decline. A plain `git push`
+# (even from a protected branch) is NOT a merge and does not fire — release
+# notes for anything else are opt-in via an explicit `/kermit --release`.
+# Never blocks the command; always exits 0.
 #
 # Wire into a project's .claude/settings.json as a PreToolUse hook with matcher "Bash":
 #   { "type": "command", "command": "$HOME/.claude/skills/kermit/hooks/kermit-merge-guard.sh" }
@@ -22,20 +25,21 @@ except Exception:
 
 branch="$(git branch --show-current 2>/dev/null || echo)"
 
+# Protected branches — a branch merging into one of these is a formal release.
 is_release=0
+# A PR merge lands a branch onto its base (a protected branch, in practice).
 case "$cmd" in
-  *"gh pr merge"*) is_release=1 ;;                       # PR merges target the base branch
+  *"gh pr merge"*) is_release=1 ;;
 esac
-# A merge while sitting on main/master.
+# A local `git merge` while sitting on a protected branch (main/master/production).
 if printf '%s' "$cmd" | grep -Eq '(^|[^[:alnum:]])git[[:space:]]+merge([^[:alnum:]]|$)'; then
-  case "$branch" in main|master) is_release=1 ;; esac
+  case "$branch" in main|master|production) is_release=1 ;; esac
 fi
-# A push carrying an explicit :main/:master refspec, or a push while on main/master.
+# A push carrying an explicit refspec ONTO a protected branch (e.g. `feature:main`).
+# A plain `git push` — even from a protected branch — is not a merge and does NOT fire.
 if printf '%s' "$cmd" | grep -Eq '(^|[^[:alnum:]])git[[:space:]]+push'; then
-  if printf '%s' "$cmd" | grep -Eq ':[[:space:]]*(main|master)([^[:alnum:]]|$)'; then
+  if printf '%s' "$cmd" | grep -Eq ':[[:space:]]*(main|master|production)([^[:alnum:]]|$)'; then
     is_release=1
-  else
-    case "$branch" in main|master) is_release=1 ;; esac
   fi
 fi
 
@@ -52,6 +56,6 @@ fi
 date +%s > "$marker" 2>/dev/null || true
 
 cat <<'JSON'
-{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"⚠️ kermit merge-guard: this command lands changes on main — a formal release. Before it completes, ask the user whether they also want to run `/kermit --release` to write user-facing release notes for RELEASES.md. If they decline, warn them the release will ship without release notes and users won't see what changed."}}
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"⚠️ kermit merge-guard: this merges a branch into a protected branch (main/master/production) — a formal release. Before it completes, ask the user whether they also want to run `/kermit --release` to write user-facing release notes for RELEASES.md. If they decline, warn them the release will ship without release notes and users won't see what changed."}}
 JSON
 exit 0

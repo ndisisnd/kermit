@@ -4,6 +4,10 @@ All notable changes to this project will be documented here.
 
 ## 2026-07-14
 
+### [32] — Release reminder only fires on real merges to protected branches
+
+- `hooks/kermit-merge-guard.sh`: fire only when a branch merges into `main`/`master`/`production` — a local `git merge` on one of those branches, a `gh pr merge`, or a push with an explicit `:main`/`:master`/`:production` refspec; a plain `git push` (even from a protected branch) no longer triggers the release reminder
+
 ### [31] — Changelog groups its entries by date
 
 - `refs/changelog-protocol.md`: regroup the format — entries now sit as `### [N]` under `## <date>` section headers, same-day commits share one date, and the defunct `## v` version markers are dropped
