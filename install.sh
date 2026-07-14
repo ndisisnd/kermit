@@ -5,8 +5,8 @@ REPO_RAW="https://raw.githubusercontent.com/ndisisnd/kermit/main"
 SKILL_DIR="${HOME}/.claude/skills/kermit"
 # Every top-level ref SKILL.md loads. Keep in sync with the repo's refs/ dir — a
 # curl-piped install can't list the repo, so a missing entry ships a broken skill.
-REFS=("init.md" "protocol-commit.md" "protocol-pr.md" "changelog-protocol.md" "changelog-reset.md")
-WORKFLOW_REFS=("release.yml" "deploy.yml")   # scaffolding templates under refs/workflows/
+REFS=("init.md" "protocol-commit.md" "protocol-pr.md" "protocol-release.md" "template-release.md" "changelog-protocol.md" "changelog-reset.md")
+HOOKS=("kermit-merge-guard.sh")              # shell hooks under hooks/
 
 # Resolve a local checkout dir if this script was run from one (git clone + ./install.sh).
 # When piped through `curl ... | bash` there is no local file, so we download instead.
@@ -37,10 +37,11 @@ fetch "SKILL.md" "${SKILL_DIR}/SKILL.md"
 for r in "${REFS[@]}"; do
   fetch "refs/${r}" "${SKILL_DIR}/refs/${r}"
 done
-# Workflow scaffolding templates live in the refs/workflows/ subdir.
-mkdir -p "${SKILL_DIR}/refs/workflows"
-for w in "${WORKFLOW_REFS[@]}"; do
-  fetch "refs/workflows/${w}" "${SKILL_DIR}/refs/workflows/${w}"
+# Hooks (e.g. the merge-to-main guard) live in hooks/ and must stay executable.
+mkdir -p "${SKILL_DIR}/hooks"
+for h in "${HOOKS[@]}"; do
+  fetch "hooks/${h}" "${SKILL_DIR}/hooks/${h}"
+  chmod +x "${SKILL_DIR}/hooks/${h}" 2>/dev/null || true
 done
 # pref.json (config) and state.json (volatile runtime state) are templates and
 # optional — skip silently if either can't be fetched.

@@ -9,6 +9,7 @@
     "bin/",
     "SKILL.md",
     "refs/",
+    "hooks/",
     "pref.json"
   ],
   "keywords": [

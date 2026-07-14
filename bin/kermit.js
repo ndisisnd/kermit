@@ -16,7 +16,7 @@ fs.copyFileSync(path.join(SRC, 'SKILL.md'), path.join(DEST, 'SKILL.md'));
 const refsDir = path.join(SRC, 'refs');
 if (fs.existsSync(refsDir)) {
   const destRefs = path.join(DEST, 'refs');
-  // Recurse so subdirs (e.g. refs/workflows/) are shipped, not just top-level files.
+  // Recurse so any nested ref files are shipped, not just top-level files.
   const copyDir = (src, dest) => {
     fs.mkdirSync(dest, { recursive: true });
     for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
@@ -27,6 +27,19 @@ if (fs.existsSync(refsDir)) {
     }
   };
   copyDir(refsDir, destRefs);
+}
+
+// Ship the hooks/ dir (e.g. the merge-to-main guard) and keep the scripts executable.
+const hooksDir = path.join(SRC, 'hooks');
+if (fs.existsSync(hooksDir)) {
+  const destHooks = path.join(DEST, 'hooks');
+  fs.mkdirSync(destHooks, { recursive: true });
+  for (const entry of fs.readdirSync(hooksDir, { withFileTypes: true })) {
+    if (!entry.isFile()) continue;
+    const to = path.join(destHooks, entry.name);
+    fs.copyFileSync(path.join(hooksDir, entry.name), to);
+    if (entry.name.endsWith('.sh')) { try { fs.chmodSync(to, 0o755); } catch {} }
+  }
 }
 
 // pref.json (config) and state.json (volatile runtime state) ship as templates.

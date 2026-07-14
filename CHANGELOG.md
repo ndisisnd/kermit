@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented here.
 
+## [30] — BREAKING: user-facing release notes replace the GitHub release/deploy workflows
+
+2026-07-14
+
+- `refs/protocol-release.md`: add — the `--release` mode writes user-facing release notes to `RELEASES.md`, grouped by type with a highlight, bounded by `last_released_number` in state
+- `refs/template-release.md`: add — Linear/Notion-style release-notes template (highlight + New/Improved/Fixed/Security/Breaking/Deprecated)
+- `RELEASES.md`: add — inaugural user-facing release notes (v1.0.0)
+- `hooks/kermit-merge-guard.sh`: add — PreToolUse hook that nudges for release notes on a merge/push to `main`
+- `SKILL.md`: make `--release` a dispatched mode (sibling of `--pr`); remove `--workflows`/`--deploy`; swap the `workflows` pref for `release_guard`; add `last_released_number` to state
+- `refs/protocol-commit.md`: remove step 7 (trigger a workflow) — the commit flow now ends at push
+- `refs/init.md`: scaffold `RELEASES.md`, offer an inaugural note, install the merge-guard; drop workflow setup
+- `pref.json`, `state.json`: replace the `workflows` object with `release_guard`; seed `last_released_number`
+- `.claude/settings.json`: wire the merge-guard as a PreToolUse hook
+- `.github/workflows/release.yml`, `.github/workflows/deploy.yml`: Removed — GitHub release/deploy workflows dropped (to be re-planned later)
+- `refs/workflows/`: Removed — workflow scaffolding templates dropped
+- `install.sh`, `install.ps1`, `bin/kermit.js`, `package.json`: ship the `hooks/` dir; drop `refs/workflows/` handling
+- `README.md`: document release notes + the merge-guard; remove the Releases & Deployments section and the workflow flags
+
 ## [29] — README flags reference is easier to scan
 
 2026-07-13

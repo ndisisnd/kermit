@@ -3,8 +3,8 @@ $ErrorActionPreference = "Stop"
 
 $repoRaw = "https://raw.githubusercontent.com/ndisisnd/kermit/main"
 $skillDir = Join-Path $HOME ".claude\skills\kermit"
-$refs = @("init.md", "changelog-protocol.md", "changelog-reset.md")
-$workflowRefs = @("release.yml", "deploy.yml")   # scaffolding templates under refs/workflows/
+$refs = @("init.md", "protocol-commit.md", "protocol-pr.md", "protocol-release.md", "template-release.md", "changelog-protocol.md", "changelog-reset.md")
+$hooks = @("kermit-merge-guard.sh")              # shell hooks under hooks/
 
 # Resolve a local checkout dir if run from one; when piped via `irm ... | iex` there is none, so download.
 $scriptDir = $PSScriptRoot
@@ -30,11 +30,12 @@ Get-KermitFile "SKILL.md" "$skillDir\SKILL.md"
 foreach ($r in $refs) {
     Get-KermitFile "refs\$r" "$skillDir\refs\$r"
 }
-# Workflow scaffolding templates live in the refs\workflows\ subdir.
-$workflowsDir = Join-Path $refsDir "workflows"
-New-Item -ItemType Directory -Force -Path $workflowsDir | Out-Null
-foreach ($w in $workflowRefs) {
-    Get-KermitFile "refs\workflows\$w" "$workflowsDir\$w"
+# Hooks (e.g. the merge-to-main guard) live in the hooks\ dir.
+$hooksDir = Join-Path $skillDir "hooks"
+if (Test-Path $hooksDir) { Remove-Item $hooksDir -Recurse -Force }
+New-Item -ItemType Directory -Force -Path $hooksDir | Out-Null
+foreach ($h in $hooks) {
+    Get-KermitFile "hooks\$h" "$hooksDir\$h"
 }
 # pref.json is a template and optional — skip silently if it can't be fetched.
 try { Get-KermitFile "pref.json" "$skillDir\pref.json" } catch {}

@@ -5,12 +5,6 @@
     "path": null,
     "protocol": null
   },
-  "workflows": {
-    "enabled": false,
-    "release_file": "release.yml",
-    "deploy_file": "deploy.yml",
-    "environments": ["staging", "production"],
-    "auto": "none"
-  },
+  "release_guard": false,
   "gate_mode": null
 }

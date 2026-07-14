@@ -4,7 +4,7 @@
 
 ### Commit good code, but what about good committing?
 
-<sub>Lightwight opinionated conventional commit style with emoji prefixes, in-built changelog, pull requests, deployment, release management, and breaking change emission. </sub>
+<sub>Lightwight opinionated conventional commit style with emoji prefixes, in-built changelog, pull requests, release notes, and breaking change emission. </sub>
 
 <br />
 
@@ -43,8 +43,8 @@ irm https://raw.githubusercontent.com/ndisisnd/kermit/main/install.ps1 | iex
 `kermit` can be used immediately, but initialising it would make the experience more seamless and personalised to your codebase + repository. Paste ```bash /kermit --init``` in your terminal. Initialising will run a step-by-step protocol that basically:
 
 1. Determines how you want to manage your changelog, personalised to your style
-2. Determines how you want to gate your commits (e.g. auto-commit, auto-approve, or even commit to push immediately)
-3. Sets up Github Workflows
+2. Sets up your release notes (`RELEASES.md`) and, optionally, the merge-to-main guard
+3. Determines how you want to gate your commits (e.g. auto-commit, auto-approve, or even commit to push immediately)
 4. Saves all your preferences in a JSON file that's used by future `/kermit` runs
 
 _If you already have a changelog, `kermit` will ask you to point to the relative path._
@@ -74,21 +74,12 @@ The same goes for pull requests — run `/kermit --pr`, or just say _open a PR_,
 
 ### Flags
 
-General flags:
-
 | Flag | What it does |
 |------|--------------|
 | `--changelog-reset [--apply]` | Rewrite an existing changelog to the latest conventions — adds `## [N]` numbering and normalises headings/dates/bullets. Backs up to `CHANGELOG.md.bak`, shows a diff, and asks before writing (`--apply` skips the confirm), then exits |
-| `--init` | Re-run the full setup (changelog + automation + workflow prefs), then exit |
+| `--init` | Re-run the full setup (changelog + release notes + commit gating), then exit |
 | `--pr` | Open — or update — a GitHub pull request for the current branch via `gh`. Operates on commits already on the branch (it doesn't create a commit), writes a Conventional-Commits title and a structured body, and shows the PR URL |
-
-Workflow-related flags:
-
-| Flag | What it does |
-|------|--------------|
-| `--deploy` | After committing, dispatch the **Deploy** workflow (put the commit live in a chosen environment) via `gh` |
-| `--release` | After committing, dispatch the **Release** workflow (version bump → npm publish → tag → GitHub Release) via `gh` |
-| `--workflows` | Turn Release/Deploy workflows on later if you declined during `--init` — enables them and scaffolds any missing `release.yml`/`deploy.yml` templates, then exits |
+| `--release` | Write user-facing **release notes** to `RELEASES.md` for everything since the last release — grouped by type, in plain language. Operates on committed history; doesn't create a commit |
 
 ### Changelog numbering
 
@@ -105,14 +96,13 @@ Bringing an older changelog up to this format? Run `/kermit --changelog-reset` �
 
 It defaults the base to your repo's default branch, or the one you name (_"open a PR to `develop`"_). If a PR already exists for the branch, kermit edits it in place instead of opening a duplicate. Approval follows the same gate mode you set during `--init`. Requires the GitHub CLI, authenticated (`gh auth login`).
 
-### Releases & Deployments
+### Release notes
 
-If you enable workflows during `--init`, kermit can drive two GitHub Actions workflows after a commit:
+`CHANGELOG.md` is written for the people building the software — one numbered entry per commit, with the files that changed. **Release notes** are written for the people _using_ it. Run `/kermit --release` (or say _"cut a release"_, _"write release notes"_) and kermit reads every change since your last release and rewrites it into `RELEASES.md`: a highlight summary up top, then changes grouped by type — **✨ New**, **📈 Improved**, **🐛 Fixed**, **🔒 Security**, **⚠️ Breaking**, **🗑️ Deprecated**.
 
-- **Release** (`.github/workflows/release.yml`) — bump the version, publish to npm with provenance, push the tag, and cut a GitHub Release whose notes are every changelog entry since the last release.
-- **Deploy** (`.github/workflows/deploy.yml`) — put the current commit live in an environment (`staging` / `production`) using GitHub Environments. The deploy command comes from your repo: a `deploy:<env>` npm script, else a `DEPLOY_CMD` repo variable, else a safe no-op.
+The notes focus on you, not the diff — what you can now do, what changed for you, and why — in plain language, no file names or jargon. It's the same spirit as the [Linear](https://linear.app/changelog) and [Notion](https://www.notion.com/releases) changelogs. `--init` scaffolds `RELEASES.md` for you (and can draft an inaugural note from your history), and approval follows the gate mode you set during setup.
 
-kermit doesn't deploy or publish itself — it dispatches the workflows via the GitHub CLI (`gh`). During `--init`, kermit can scaffold both workflow templates into a repo that doesn't have them yet (it never overwrites existing files).
+**Automatic prompt on merge to main.** A release is a formal moment — usually a branch landing on `main`. If you enable the **merge-to-main guard** during `--init`, kermit watches for a merge or push to `main` and reminds you to write release notes first, warning you if you skip them (so a release never ships silently). The guard is a local hook — it prompts, it never blocks your merge.
 
 ## License
 

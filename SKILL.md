@@ -9,21 +9,22 @@ refs:
   - refs/init.md
   - refs/protocol-commit.md
   - refs/protocol-pr.md
+  - refs/protocol-release.md
+  - refs/template-release.md
   - refs/changelog-protocol.md
   - refs/changelog-reset.md
 ---
 
 ## Usage
 
-**Invoke**: `/kermit [--pr] [--init] [--changelog-reset] [--workflows] [--release] [--deploy]` — "commit this", "make a commit", "commit my changes"
+**Invoke**: `/kermit [--pr] [--init] [--changelog-reset] [--release]` — "commit this", "make a commit", "commit my changes"
 
-**Natural-language routing** (no flag needed): PR intent ("make/open/raise a PR", "open a pull request to `<base>`", "PR this branch") → `--pr`; if the user names a base ("…to `develop`"), use it as the PR base. Otherwise commit intent → the default commit flow.
+**Natural-language routing** (no flag needed): PR intent ("make/open/raise a PR", "open a pull request to `<base>`", "PR this branch") → `--pr`; if the user names a base ("…to `develop`"), use it as the PR base. Release intent ("write release notes", "cut a release", "do a release") → `--release`. Otherwise commit intent → the default commit flow.
 
 - `--pr`: run the **PR protocol** (`refs/protocol-pr.md`) — open/update a GitHub pull request for the current branch via `gh`. Operates on commits already on the branch; does **not** create a commit.
 - `--init`: re-run the full init block regardless of prior initialization, then exit.
 - `--changelog-reset [--apply]`: rewrite the existing changelog to current conventions (`## [N]` numbering, normalised headings/dates/bullets); shows a diff and confirms before writing (`--apply` skips the confirm), then exits.
-- `--workflows`: (re)run **only** the Release/Deploy workflow setup — enable workflows and scaffold the missing `release.yml`/`deploy.yml` templates — then exit. Use it to turn workflows on later if you declined during `--init`; the normal commit flow never re-prompts for this.
-- `--release` / `--deploy`: run the full commit flow first, then skip the step-7 "Trigger a workflow?" question and go straight to a Release (version bump + publish) or Deploy (put the commit live in an environment), dispatched via `gh`.
+- `--release`: run the **release protocol** (`refs/protocol-release.md`) — write user-facing release notes to `RELEASES.md` for the changes since the last release, organised by type with a highlight summary. Operates on committed history; does **not** create a commit.
 
 ## Inputs
 
@@ -46,27 +47,27 @@ refs:
 
 Two protocol modes, each in its own ref:
 
-- **Commit** (default) — `refs/protocol-commit.md`: format a message, gate it, commit, optionally push and trigger a workflow.
+- **Commit** (default) — `refs/protocol-commit.md`: format a message, gate it, commit, and optionally push.
 - **PR** — `refs/protocol-pr.md`: open/update a pull request for the current branch.
 
 kermit keeps two files under `.claude/kermit/`: **`pref.json`** holds stable config
-(`initialized`, `init_commit`, `changelog.*`, `workflows.*`, `gate_mode`) and is safe to
+(`initialized`, `init_commit`, `changelog.*`, `release_guard`, `gate_mode`) and is safe to
 commit; **`state.json`** holds volatile runtime state (`last_logged_commit`, `last_number`,
-`backfill`) that is rewritten on every commit and must stay git-ignored. Both are read
+`last_released_number`, `backfill`) that is rewritten on every commit and must stay git-ignored. Both are read
 **once** at the mode-check step below — cache their values for the rest of the run rather
 than re-reading either file in later steps.
 
 ### Mode check (runs before everything else)
 
 - **`--changelog-reset`** → read `refs/changelog-reset.md`, follow it end-to-end, then **exit** — do not run the commit flow.
-- **`--workflows`** → read `.claude/kermit/pref.json`. If it is absent or `initialized` is `false`, fall through to the normal init below (the full `--init` flow already covers workflow setup). Otherwise read `refs/init.md` and run **only its step 3 (Workflow setup)** against the existing pref: ask whether to enable Release/Deploy workflows, and on `Yes` set `workflows.enabled: true` and offer to scaffold any missing `release.yml`/`deploy.yml` templates (never overwrite existing files). Merge-write the resulting `workflows` object back into `.claude/kermit/pref.json` in a single write, preserving all other keys. Then **exit** — do not run the commit flow.
 - **Otherwise** → read `.claude/kermit/pref.json` and `.claude/kermit/state.json`. If pref is absent, create it with `{"initialized":false}`. If `initialized` is `false` **or** `--init` was passed: read `refs/init.md` and follow it end-to-end, then continue as it directs. Otherwise fall through to the protocol dispatch below.
-  - **Legacy migration.** Older prefs kept the state fields inside `pref.json`. If `state.json` is absent, create it now — seed `last_logged_commit` from `pref.last_logged_commit`, `last_number` from `pref.changelog.last_number`, and `backfill` from `pref.backfill` (each defaulting to `null`/`0` when the legacy key is missing), then rewrite `pref.json` without those three keys and ensure `.claude/kermit/state.json` is in `.gitignore` (`grep -qxF '.claude/kermit/state.json' .gitignore 2>/dev/null || printf '.claude/kermit/state.json\n' >> .gitignore`). Cache the migrated state for the run.
+  - **Legacy migration.** Older prefs kept the state fields inside `pref.json`. If `state.json` is absent, create it now — seed `last_logged_commit` from `pref.last_logged_commit`, `last_number` from `pref.changelog.last_number`, `last_released_number` to `0`, and `backfill` from `pref.backfill` (each defaulting to `null`/`0` when the legacy key is missing), then rewrite `pref.json` without those three keys and ensure `.claude/kermit/state.json` is in `.gitignore` (`grep -qxF '.claude/kermit/state.json' .gitignore 2>/dev/null || printf '.claude/kermit/state.json\n' >> .gitignore`). Cache the migrated state for the run.
 
 ### Protocol dispatch
 
 Select the protocol mode and read its ref, then follow it end-to-end:
 
+- `--release` was passed → read **`refs/protocol-release.md`** and follow it.
 - `--pr` was passed → read **`refs/protocol-pr.md`** and follow it.
 - Otherwise (default commit flow) → read **`refs/protocol-commit.md`** and follow it.
 

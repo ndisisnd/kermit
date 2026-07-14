@@ -1,9 +1,9 @@
 # Commit protocol
 
 The default kermit flow: format a Conventional Commits message, gate it, commit,
-optionally push, and optionally trigger a workflow.
+and optionally push.
 
-**General rule:** batch independent commands into one Bash call (step 1 does this for the rtk check + diff read). `.claude/kermit/pref.json` (config) and `.claude/kermit/state.json` (volatile state — git-ignored) are read once at mode-check (SKILL.md) — cache `gate_mode`/`changelog.*`/`workflows.*` from pref and `last_logged_commit`/`last_number` from state for the run; don't re-read either in later steps.
+**General rule:** batch independent commands into one Bash call (step 1 does this for the rtk check + diff read). `.claude/kermit/pref.json` (config) and `.claude/kermit/state.json` (volatile state — git-ignored) are read once at mode-check (SKILL.md) — cache `gate_mode`/`changelog.*` from pref and `last_logged_commit`/`last_number` from state for the run; don't re-read either in later steps.
 
 ## Gate resolution (runs once, before step 1)
 
@@ -20,11 +20,11 @@ sets the effective `auto_approve` / `auto_commit` / `auto_merge` values used by 
 
 **Legacy fallback:** if `gate_mode` is absent (older prefs), use the individual
 `auto_approve` / `auto_commit` / `auto_merge` booleans and treat `push_enabled` as
-`true`. When `push_enabled` is `false` (`commit-only`), **skip steps 6 and 7
-entirely** — do not push, do not ask, do not trigger workflows.
+`true`. When `push_enabled` is `false` (`commit-only`), **skip step 6
+entirely** — do not push, do not ask.
 
 ---
-1. Detect rtk **and** read the staged diff in one Bash call: `which rtk >/dev/null 2>&1 && RTK=rtk || RTK=; echo "(1) Reading latest git diff..."; $RTK git diff --staged`. If rtk is absent, `$RTK` is empty and commands run as plain `git`. Do **not** check the GitHub CLI here — `gh auth status` is a network call deferred to step 7 (workflows are off on most commits).
+1. Detect rtk **and** read the staged diff in one Bash call: `which rtk >/dev/null 2>&1 && RTK=rtk || RTK=; echo "(1) Reading latest git diff..."; $RTK git diff --staged`. If rtk is absent, `$RTK` is empty and commands run as plain `git`.
 
 2. Emit `(2) Writing commit message...` Produce a Conventional Commits message:
    - Line 1: `<emoji> <type>[(<scope>)][!]: <description>` — ≤72 chars total; description is lowercase imperative; `!` and `BREAKING CHANGE` footer are both required for breaking changes. Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Pick an emoji matching the type (e.g. ✨ feat, 🐛 fix, 📝 docs, ♻️ refactor, 🚀 perf, ✅ test, 🔧 chore).
@@ -40,8 +40,4 @@ entirely** — do not push, do not ask, do not trigger workflows.
    - If `CHANGELOG_EXISTS=1` in cache: append an entry following the user's changelog format — use `changelog.protocol` from the pref.json already read at the mode-check step (do not re-read the file); if it is an object, honour its `summary`/`fields`/`show_files`/`flag_breaking` (or free-text `description`) when writing the entry. Only if `changelog.protocol` is `null`, read `refs/changelog-protocol.md` now and follow it. **Number the entry** (unless a custom `changelog.protocol` sets `"number": false`): use the cached `last_number` from state.json (if absent, use the highest existing `## [k]` in the file, ignoring `## v…` markers, else 0); let `N = that + 1` and write the heading as `## [N] — <summary>`. kermit commits one at a time, so exactly one numbered entry is written per run.
    - If `CHANGELOG_EXISTS=0`: Stop hook initializes after session
    Run `$RTK git commit -m "<approved message>"`. **Then** record runtime state in `.claude/kermit/state.json` in a single write: set `"last_logged_commit"` to the new HEAD SHA (`git log -1 --format="%H"` — the commit just made) **and** `"last_number"` to `N`, preserving all other keys. Writing state.json *after* the commit keeps it out of the commit, and since state.json is git-ignored the write never dirties the working tree.
-6. If `push_enabled` is `false` (`commit-only` mode), skip this step and step 7 entirely — the run ends after the commit. Otherwise: if `auto_merge` is `true`, skip the question and proceed as `yes`; else use `AskUserQuestion` — question: `(6) Push to remote?`, options: `yes`, `no`. On yes: run `$RTK git push`.
-7. **Trigger a workflow?** Run this step only if the push in step 6 happened **and** `workflows.enabled` is `true` in pref.json. If either is false, skip step 7 silently. Only when both hold, check the GitHub CLI **now** (deferred from step 1): `gh auth status >/dev/null 2>&1 && GH_OK=1 || GH_OK=0`. If `GH_OK=0`, emit once: `💡 Install & auth the GitHub CLI to trigger workflows: gh auth login`, then skip. Otherwise continue.
-   - **Choose the action.** If `--release` or `--deploy` was passed, use it directly. Else if `workflows.auto` is `release:<bump>` or `deploy:<env>`, use that. Otherwise use `AskUserQuestion` — question: `(7) Trigger a workflow?`, options: `Release`, `Deploy`, `No`. On `No`: terminate.
-   - **Release** → pick the bump: `AskUserQuestion` — question: `Release — which bump?`, options: `patch`, `minor`, `major` (skip if `--release=<bump>`/auto already names one). Run `$RTK gh workflow run "$(node -p "require('./.claude/kermit/pref.json').workflows.release_file" 2>/dev/null || echo release.yml)" -f bump=<bump>`. Then emit the run: `$RTK gh run list --workflow=release.yml -L1`.
-   - **Deploy** → pick the environment: `AskUserQuestion` — question: `Deploy — which environment?`, options sourced from `workflows.environments` in pref.json (fallback `staging`, `production`). Run `$RTK gh workflow run "$(node -p "require('./.claude/kermit/pref.json').workflows.deploy_file" 2>/dev/null || echo deploy.yml)" -f environment=<env>`. Then emit `$RTK gh run list --workflow=deploy.yml -L1`.
+6. If `push_enabled` is `false` (`commit-only` mode), skip this step entirely — the run ends after the commit. Otherwise: if `auto_merge` is `true`, skip the question and proceed as `yes`; else use `AskUserQuestion` — question: `(6) Push to remote?`, options: `yes`, `no`. On yes: run `$RTK git push`. This is the final step of the commit flow.
