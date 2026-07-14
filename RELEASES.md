@@ -2,6 +2,18 @@
 
 What's new for you, release by release.
 
+## v2.0.0 — 2026-07-14
+
+> kermit now writes release notes for the people using your software — and reminds you to before you ship. The older GitHub-based auto-release and deploy commands are stepping back for now while that side is redesigned.
+
+### ✨ New
+- Write user-facing release notes with `/kermit --release`. kermit gathers everything since your last release and rewrites it in plain language, grouped by type, into `RELEASES.md` — so the people using your software can see what changed for them.
+- Never ship a release silently: when you merge or push to `main`, kermit reminds you to write release notes first and warns you if you skip. Switch it on during `/kermit --init`.
+- Setup now covers release notes too — `/kermit --init` creates `RELEASES.md` for you and can draft an initial note from your history.
+
+### ⚠️ Breaking
+- The GitHub **Release** and **Deploy** automations — and their `--deploy` and `--workflows` commands — have been removed while that area is redesigned. `--release` no longer bumps the version or publishes; it writes release notes only. If you relied on the old one-command publish or deploy, use your usual `npm`/deploy steps for now — workflow support will return in a later version.
+
 ## v1.0.0 — 2026-07-14
 
 > Meet kermit — one command that writes your commit messages, keeps a changelog for you, and now opens pull requests, drafts release notes, and ships releases too. Set it up once and stop thinking about how to write a good commit.

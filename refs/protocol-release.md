@@ -25,13 +25,13 @@ the `auto_approve` boolean, default `false`.
    `# Releases\n\nWhat's new for you, release by release.\n`.
 
 2. **Determine the range.** The "unreleased" slice is every changelog entry with a number
-   greater than the cached `last_released_number` from `state.json` (the highest `## [N]`
-   already covered by a previous release; `0` means nothing has been released yet). Collect
-   each `## [N]` entry whose `N > last_released_number` — since entries are newest-on-top with
-   the highest `N` first, that is the run of entries from the top of the file down to (and
-   including) the one numbered `last_released_number + 1`. Any `## v…` line is a legacy marker —
-   skip it. If no entry qualifies, emit `No unreleased changes to write notes for.` and exit.
-   Remember the highest `N` in the slice as `N_top` (it equals `last_number` from state).
+   greater than the cached `last_released_number` from `state.json` (the highest `### [N]`
+   already covered by a previous release; `0` means nothing has been released yet). The
+   changelog groups entries under `## <date>` sections with `### [N] — <summary>` entries
+   beneath them — collect each `### [N]` entry whose `N > last_released_number` (ignore the
+   `## <date>` section headers; they are not entries). If no entry qualifies, emit
+   `No unreleased changes to write notes for.` and exit. Remember the highest `N` in the slice
+   as `N_top` (it equals `last_number` from state).
 
 3. **Determine the version label.** If `--release=<x.y.z>` or a bump was named, use it.
    Otherwise decide the bump from the change mix — any breaking change → `major`; else any new

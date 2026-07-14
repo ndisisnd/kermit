@@ -23,7 +23,7 @@ refs:
 
 - `--pr`: run the **PR protocol** (`refs/protocol-pr.md`) — open/update a GitHub pull request for the current branch via `gh`. Operates on commits already on the branch; does **not** create a commit.
 - `--init`: re-run the full init block regardless of prior initialization, then exit.
-- `--changelog-reset [--apply]`: rewrite the existing changelog to current conventions (`## [N]` numbering, normalised headings/dates/bullets); shows a diff and confirms before writing (`--apply` skips the confirm), then exits.
+- `--changelog-reset [--apply]`: rewrite the existing changelog to current conventions (entries grouped under `## <date>` sections, numbered `### [N]`, normalised bullets); shows a diff and confirms before writing (`--apply` skips the confirm), then exits.
 - `--release`: run the **release protocol** (`refs/protocol-release.md`) — write user-facing release notes to `RELEASES.md` for the changes since the last release, organised by type with a highlight summary. Operates on committed history; does **not** create a commit.
 
 ## Inputs

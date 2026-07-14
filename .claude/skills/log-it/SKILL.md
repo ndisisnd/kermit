@@ -83,29 +83,25 @@ On no: emit `Changelog unchanged. Re-run \`/log-it\` any time to sync.` and exit
 
 ### 5. Write changelog entries
 
-**One numbered `## [N]` entry per commit** — do NOT collapse commits into date groups. Each commit gets its own entry (its date shown on its own line under the heading).
+The changelog groups entries by date: a `## <YYYY-MM-DD>` section header with one `### [N] — <summary>` entry per commit beneath it (see `refs/changelog-protocol.md`). **Commits from the same day share one date header** — do not repeat the date.
 
 For each commit in the list (oldest-first):
 - Run `$RTK git show <SHA> --stat --format="" | head -30` to get changed files.
-- Run `$RTK git show <SHA> -s --format="%s%n%b"` to get subject and body.
+- Run `$RTK git show <SHA> -s --format="%s%n%b"` to get subject and body — and note the commit's date (`%ad`, `--date=short`).
 
 Write each entry following the user's changelog format — if pref.json has a `changelog.protocol` object set (from kermit's custom protocol sub-flow), honour its `summary`/`fields`/`show_files`/`flag_breaking` (or free-text `description`). Only if `changelog.protocol` is `null` (or absent), read `refs/changelog-protocol.md` now and follow it.
 
-**Numbering** (unless a custom `changelog.protocol` sets `"number": false`): resolve the starting number once — `last_number` from `.claude/kermit/state.json`, else the highest existing `## [k]` in the file (ignoring `## v…` markers), else 0. Number the commits **oldest→newest** (`start+1 … start+k`), so the newest commit carries the highest `N`.
+**Numbering** (unless a custom `changelog.protocol` sets `"number": false`): resolve the starting number once — `last_number` from `.claude/kermit/state.json`, else the highest existing `### [k]` in the file, else 0. Number the commits **oldest→newest** (`start+1 … start+k`), so the newest commit carries the highest `N`.
 
-**Prepend** the new entries — **newest-first** so the top of the file carries the largest `N` — before the first existing `## ` line in `$CHANGELOG`. Use a temporary file and `mv`:
-```bash
-TMP=$(mktemp)
-printf '%s\n\n' "<new entries block, newest-first>" > "$TMP"
-grep -n "^## " "$CHANGELOG" | head -1   # find insertion line
-# insert before first ## line, or append if none exists
-```
+**Place each entry by date**, working newest-commit-first so higher numbers land above lower ones:
+- If the commit's date already has a `## <date>` section in the file, insert its `### [N] — <summary>` entry as the **first** entry under that header (above the day's existing newest entry).
+- Otherwise, open a **new** `## <date>` section in the correct chronological position (newest date nearest the top, below the `# Changelog` preamble) and put the entry under it.
 
-After writing, emit `Changelog updated — <k> commit(s) logged as [<start+1>..<start+k>].`
+Use a temporary file and `mv` to rewrite the file. After writing, emit `Changelog updated — <k> commit(s) logged as [<start+1>..<start+k>].`
 
 ### 6. Update state.json
 
-After a successful write, update `.claude/kermit/state.json` in a single write (create it with `{"last_logged_commit":null,"last_number":0,"backfill":null}` first if absent, and ensure `.claude/kermit/state.json` is git-ignored — `grep -qxF '.claude/kermit/state.json' .gitignore 2>/dev/null || printf '.claude/kermit/state.json\n' >> .gitignore`):
+After a successful write, update `.claude/kermit/state.json` in a single write (create it with `{"last_logged_commit":null,"last_number":0,"last_released_number":0,"backfill":null}` first if absent, and ensure `.claude/kermit/state.json` is git-ignored — `grep -qxF '.claude/kermit/state.json' .gitignore 2>/dev/null || printf '.claude/kermit/state.json\n' >> .gitignore`):
 - Set `"last_logged_commit"` to the SHA of the most recent commit that was just logged (HEAD).
 - Set `"last_number"` to the highest `N` written.
 - Preserve all other keys in state.json.
