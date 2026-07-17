@@ -15,11 +15,6 @@
 
 <br />
 
-<img width="240" src="./asset/readme.jpg">
-
-<br />
-<br />
-
 <img width="480" src="./asset/kermit_demo_1.gif">
 
 <br />
@@ -88,7 +83,18 @@ _If you already have a changelog, `kermit` will ask you to point to the relative
 
 ## How does it work?
 
-This is the default flow — what you get when you run `/kermit` with no flags.
+<div align="center">
+<br />
+
+<img width="300" src="./asset/readme.jpg">
+
+<br />
+
+**This is the default flow — what you get when you run `/kermit` with no flags.**
+
+</div>
+
+
 
 ```mermaid
 flowchart TD
@@ -113,6 +119,7 @@ flowchart TD
     push -->|no| done
     pushed --> done
 ```
+
 
 kermit reads your staged diff — if you didn't stage anything, your LLM will tell you to stage your changes first. It writes the message from the inbuilt protocols, then hands it to the gate mode you selected during `--init`. The gate mode decides which of steps 3, 4 and 6 actually stop to ask you: `full` asks at all three, `auto` asks only for approval, `flash` asks nothing and pushes, and `commit-only` commits without ever pushing.
 
@@ -164,7 +171,7 @@ It defaults the base to your repo's default branch, or the one you name (_"open 
 
 `CHANGELOG.md` is written for the people building the software — one numbered entry per commit, with the files that changed. **Release notes** are written for the people _using_ it. Run `/kermit --release` (or say _"cut a release"_, _"write release notes"_) and kermit reads every change since your last release and rewrites it into `RELEASES.md`: a highlight summary up top, then changes grouped by type — **✨ New**, **📈 Improved**, **🐛 Fixed**, **🔒 Security**, **⚠️ Breaking**, **🗑️ Deprecated**.
 
-The notes focus on you, not the diff — what you can now do, what changed for you, and why — in plain language, no file names or jargon. It's the same spirit as the [Linear](https://linear.app/changelog) and [Notion](https://www.notion.com/releases) changelogs. `--init` scaffolds `RELEASES.md` for you (and can draft an inaugural note from your history), and approval follows the gate mode you set during setup.
+The notes focus on you, not the diff — what you can now do, what changed for you, and why — in plain language, no file names or jargon.\ `--init` scaffolds `RELEASES.md` for you (and can draft an inaugural note from your history), and approval follows the gate mode you set during setup.
 
 Once you approve the notes, kermit finishes the release for you: it bumps your `package.json` version, commits both files as `🔖 chore(release): vX.Y.Z`, pushes, and publishes a tagged GitHub release with those same notes as the body. The release commit deliberately gets no changelog entry — it's bookkeeping, not a change your users need to read about next time. Each step follows your gate mode, so `full` asks before committing and before publishing, while `flash` does the lot. Publishing needs the GitHub CLI authenticated (`gh auth login`); without it, kermit still writes and commits the notes and tells you the one command to publish yourself.
 

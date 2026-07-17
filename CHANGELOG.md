@@ -4,6 +4,11 @@ All notable changes to this project will be documented here.
 
 ## 2026-07-17
 
+### [35] — The README's default-flow walkthrough now opens with the kermit mark
+
+- `README.md`: Changed — move the kermit mark from the top block down into a centred header for the default-flow section, so the flow diagram is introduced by the mark rather than the page repeating it up top
+  - Removed — the Linear/Notion changelog comparison from the release-notes copy
+
 ### [34] — BREAKING: installing kermit now ships 88K instead of 14MB, and `/log-it` becomes `/kermit --changelog-sync`
 
 - `skills/kermit/`: Changed — the skill body (SKILL.md, refs/, hooks/, pref.json, state.json) moves under a dedicated skill dir, so `npx skills add` and both installers copy only the skill (88K) instead of the whole repo, 13.7MB demo GIF included
