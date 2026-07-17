@@ -2,6 +2,29 @@
 
 What's new for you, release by release.
 
+## v3.0.0 — 2026-07-17
+
+> Installing kermit now copies 88KB instead of 14MB, and `--release` finishes the whole release for you — notes, version bump, tag, and a published GitHub release. The separate `/log-it` command has folded into kermit as `/kermit --changelog-sync`, so there's one skill to install instead of two.
+
+### ✨ New
+- Finish a release in one command. `/kermit --release` now writes your notes, bumps your version, commits, pushes, and publishes a tagged GitHub release — where before it wrote the notes and left the rest to you.
+- Catch a changelog that's fallen behind with `/kermit --changelog-sync`. It finds commits that landed without an entry — you committed by hand, or a session ended early — shows you what's missing, and writes them in.
+- Install on any platform, Windows included, with `npx skills add ndisisnd/kermit -g`.
+
+### 📈 Improved
+- Installing kermit copies 88KB instead of 14MB, because it no longer drags the demo video and the rest of the project onto your machine along with the skill.
+- Changelog entries are grouped under the day they landed, so a week of work reads as a few dated sections instead of one flat wall.
+- kermit now tells you where to report a security problem privately, and ships a readme that shows you the commit flow at a glance rather than describing it.
+
+### 🐛 Fixed
+- The release reminder no longer interrupts an ordinary push. It waits for a real merge into a protected branch — which is when a release is actually due.
+- The same reminder stopped firing at its own shadow: the word "merge" inside a commit message or an echoed string no longer sets it off.
+
+### ⚠️ Breaking
+- `/log-it` is gone. Use `/kermit --changelog-sync` instead — it does the same job, and it's one less thing to install.
+- The Windows PowerShell installer is gone. Install with `npx skills add ndisisnd/kermit -g`, which works the same on Windows, macOS and Linux.
+- kermit's files moved into `skills/kermit/`. If you pinned anything to their old spots — a hook path, a download link — repoint it. A fresh install needs nothing from you.
+
 ## v2.0.0 — 2026-07-14
 
 > kermit now writes release notes for the people using your software — and reminds you to before you ship. The older GitHub-based auto-release and deploy commands are stepping back for now while that side is redesigned.
