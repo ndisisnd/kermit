@@ -3,9 +3,12 @@ set -euo pipefail
 
 REPO_RAW="https://raw.githubusercontent.com/ndisisnd/kermit/main"
 SKILL_DIR="${HOME}/.claude/skills/kermit"
-# Every top-level ref SKILL.md loads. Keep in sync with the repo's refs/ dir — a
-# curl-piped install can't list the repo, so a missing entry ships a broken skill.
-REFS=("init.md" "protocol-commit.md" "protocol-pr.md" "protocol-release.md" "template-release.md" "changelog-protocol.md" "changelog-reset.md")
+# The skill body lives under skills/kermit/ in the repo so packagers ship only it,
+# not the whole repo. Everything below is fetched relative to this prefix.
+SKILL_SRC="skills/kermit"
+# Every top-level ref SKILL.md loads. Keep in sync with the repo's skills/kermit/refs/
+# dir — a curl-piped install can't list the repo, so a missing entry ships a broken skill.
+REFS=("protocol-init.md" "protocol-commit.md" "protocol-pr.md" "protocol-release.md" "protocol-changelog-sync.md" "template-release.md" "changelog-protocol.md" "changelog-reset.md")
 HOOKS=("kermit-merge-guard.sh")              # shell hooks under hooks/
 
 # Resolve a local checkout dir if this script was run from one (git clone + ./install.sh).
@@ -33,20 +36,20 @@ echo "Installing kermit → ${SKILL_DIR}"
 rm -rf "${SKILL_DIR}"
 mkdir -p "${SKILL_DIR}/refs"
 
-fetch "SKILL.md" "${SKILL_DIR}/SKILL.md"
+fetch "${SKILL_SRC}/SKILL.md" "${SKILL_DIR}/SKILL.md"
 for r in "${REFS[@]}"; do
-  fetch "refs/${r}" "${SKILL_DIR}/refs/${r}"
+  fetch "${SKILL_SRC}/refs/${r}" "${SKILL_DIR}/refs/${r}"
 done
 # Hooks (e.g. the merge-to-main guard) live in hooks/ and must stay executable.
 mkdir -p "${SKILL_DIR}/hooks"
 for h in "${HOOKS[@]}"; do
-  fetch "hooks/${h}" "${SKILL_DIR}/hooks/${h}"
+  fetch "${SKILL_SRC}/hooks/${h}" "${SKILL_DIR}/hooks/${h}"
   chmod +x "${SKILL_DIR}/hooks/${h}" 2>/dev/null || true
 done
 # pref.json (config) and state.json (volatile runtime state) are templates and
 # optional — skip silently if either can't be fetched.
-fetch "pref.json" "${SKILL_DIR}/pref.json" 2>/dev/null || true
-fetch "state.json" "${SKILL_DIR}/state.json" 2>/dev/null || true
+fetch "${SKILL_SRC}/pref.json" "${SKILL_DIR}/pref.json" 2>/dev/null || true
+fetch "${SKILL_SRC}/state.json" "${SKILL_DIR}/state.json" 2>/dev/null || true
 
 echo "Done. Installed → ${SKILL_DIR}"
 echo

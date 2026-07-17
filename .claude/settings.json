@@ -10,7 +10,7 @@
           },
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR/hooks/kermit-merge-guard.sh\""
+            "command": "\"$CLAUDE_PROJECT_DIR/skills/kermit/hooks/kermit-merge-guard.sh\""
           }
         ]
       }

@@ -9,7 +9,7 @@ Detect rtk: `which rtk >/dev/null 2>&1 && RTK=rtk || RTK=`.
 
 ## 1. Resolve the changelog path
 
-Same resolution as log-it: read `.claude/kermit/pref.json`; use `changelog.path` if
+Same resolution as `--changelog-sync`: read `.claude/kermit/pref.json`; use `changelog.path` if
 present. Otherwise `find . -maxdepth 3 \( -iname 'changelog*' -o -iname 'history*' \) 2>/dev/null | grep -v node_modules | head -1`.
 If nothing is found, emit `No changelog found — nothing to reset.` and exit.
 Store the resolved path as `CHANGELOG`.

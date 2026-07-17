@@ -7,10 +7,7 @@
   },
   "files": [
     "bin/",
-    "SKILL.md",
-    "refs/",
-    "hooks/",
-    "pref.json"
+    "skills/"
   ],
   "keywords": [
     "claude",

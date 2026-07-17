@@ -12,8 +12,8 @@ on:
     paths:
       - 'install.sh'
       - 'package.json'
-      - 'SKILL.md'
-      - 'refs/**'
+      - 'bin/**'
+      - 'skills/**'
       - '.github/workflows/**'
 
 # Cancel an in-progress run when a newer commit is pushed to the same ref.
@@ -42,9 +42,23 @@ jobs:
           '
 
       - name: Every refs/ pointer in SKILL.md must resolve
+        # SKILL.md's ref pointers are relative to the skill dir, which is what ships —
+        # so resolve them from there, not from the repo root.
         run: |
+          cd skills/kermit
           missing=0
           for r in $(grep -oE 'refs/[A-Za-z0-9._-]+\.md' SKILL.md | sort -u); do
             if [ ! -f "$r" ]; then echo "dangling ref in SKILL.md: $r"; missing=1; fi
           done
           exit $missing
+
+      - name: install.sh REFS array must match the refs/ dir
+        # A curl-piped install can't list the repo, so a ref missing from the array
+        # ships a broken skill. Compare the array against what's actually on disk.
+        run: |
+          on_disk=$(ls skills/kermit/refs | sort)
+          in_array=$(grep -oE '^REFS=\(.*\)' install.sh | grep -oE '[A-Za-z0-9._-]+\.md' | sort)
+          if ! diff <(echo "$on_disk") <(echo "$in_array"); then
+            echo "install.sh REFS array is out of sync with skills/kermit/refs/"
+            exit 1
+          fi

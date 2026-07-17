@@ -3,7 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const SRC = path.join(__dirname, '..');
+// The skill body lives under skills/kermit/ so packagers ship only it, not the repo.
+const SRC = path.join(__dirname, '..', 'skills', 'kermit');
 const DEST = path.join(os.homedir(), '.claude', 'skills', 'kermit');
 
 // Wipe any previous install so files retired or renamed in an upgrade don't linger.

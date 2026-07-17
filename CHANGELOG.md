@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented here.
 
+## 2026-07-17
+
+### [34] — BREAKING: installing kermit now ships 88K instead of 14MB, and `/log-it` becomes `/kermit --changelog-sync`
+
+- `skills/kermit/`: Changed — the skill body (SKILL.md, refs/, hooks/, pref.json, state.json) moves under a dedicated skill dir, so `npx skills add` and both installers copy only the skill (88K) instead of the whole repo, 13.7MB demo GIF included
+- `skills/kermit/refs/protocol-changelog-sync.md`: Added — log-it's backfill protocol, now reached via `--changelog-sync`
+  - reuses the pref/state values already read at mode-check rather than re-reading both files
+  - honours `gate_mode` like every other mode, so `flash`/`auto` write without asking
+- `skills/kermit/SKILL.md`: Changed — add `--changelog-sync` to the usage line, natural-language routing and protocol dispatch; four protocol modes now
+- `.claude/skills/log-it/`: Removed — the standalone skill, and with it a byte-identical duplicate of `changelog-protocol.md`; the format doc is now a single source of truth
+- `skills/kermit/refs/protocol-release.md`: Added — the release commit and GitHub publish steps, with an `auto_publish` column in the gate table
+- `skills/kermit/refs/protocol-commit.md`: Changed — point the manual-commit tips at `/kermit --changelog-sync`
+- `skills/kermit/refs/protocol-init.md`: Changed — renamed from `init.md` to match the `protocol-*` convention
+- `skills/kermit/refs/changelog-reset.md`: Changed — refer to `--changelog-sync` for changelog path resolution
+- `install.sh`: Changed — fetch everything under `skills/kermit/`, and add `protocol-changelog-sync.md` to the REFS array
+- `install.ps1`: Removed — `npx skills add ndisisnd/kermit -g` installs on Windows without a PowerShell script
+- `bin/kermit.js`: Changed — copy from `skills/kermit/` rather than the repo root
+- `package.json`: Changed — `files` narrows to `["bin/", "skills/"]`
+- `.github/workflows/ci.yml`: Changed — resolve SKILL.md's refs from the skill dir, and add a check that install.sh's REFS array matches `skills/kermit/refs/` on disk
+- `.claude/settings.json`: Changed — point the merge guard at its new path
+- `README.md`: Changed — figlet header, badges, a mermaid diagram of the default commit flow, new "How to update" and FAQ sections, and `npx skills add` as the cross-platform install
+- `SECURITY.md`: Added — private vulnerability reporting via GitHub advisories, plus scope and supported versions
+- `llms.txt`: Added — an index of the repo's entry points for agents
+- `LICENSE.md`: Changed — renamed from `LICENSE`
+
 ## 2026-07-14
 
 ### [33] — Merge reminder no longer misfires on quoted text or wrapped git commands

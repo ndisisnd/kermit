@@ -1,0 +1,36 @@
+# kermit
+
+> A Claude Code skill that writes Conventional Commits with emoji prefixes, and maintains a changelog, pull requests, and user-facing release notes alongside them.
+
+kermit is prose, not code — the behavior lives in markdown protocols that an agent reads
+and follows, so changing what kermit *does* means editing a ref, not a source file. The
+`bin/` and `install.sh` scripts only install; the skill body itself is everything under
+`skills/kermit/`, and that is the only part that ships. `SKILL.md` is a router: it resolves
+the mode, then hands off to exactly one `refs/protocol-*.md` and follows it end to end. Two
+config files live under `.claude/kermit/` in the *user's* repo — `pref.json` (stable, safe
+to commit) and `state.json` (volatile, git-ignored); both are read once at mode-check.
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/ndisisnd/kermit/main/README.md): what kermit is, install, the flags, how each mode behaves
+- [SKILL.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/SKILL.md): the router — mode check, legacy migration, protocol dispatch. Start here to change behavior
+- [protocol-init.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/protocol-init.md): the `--init` setup interview — changelog style, gate mode, release notes, merge guard
+
+## Reference
+
+- [protocol-commit.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/protocol-commit.md): the default flow — read staged diff, format the message, gate, commit, push. Defines the `gate_mode` table the other protocols reuse
+- [protocol-pr.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/protocol-pr.md): `--pr` — open or update a GitHub PR via `gh`; makes no commit
+- [protocol-release.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/protocol-release.md): `--release` — write release notes, bump `package.json`, commit, publish a tagged GitHub release
+- [protocol-changelog-sync.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/protocol-changelog-sync.md): `--changelog-sync` — find commits with no changelog entry and backfill them; writes the changelog, makes no commit
+- [template-release.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/template-release.md): exact shape, section order, and voice rules for `RELEASES.md`. Read by protocol-release
+- [changelog-protocol.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/changelog-protocol.md): how a `CHANGELOG.md` entry is written and numbered. The single source of truth — protocol-commit and protocol-changelog-sync both defer to it
+- [changelog-reset.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/changelog-reset.md): `--changelog-reset` — renumber and normalise an existing changelog in place
+- [install.sh](https://raw.githubusercontent.com/ndisisnd/kermit/main/install.sh): macOS/Linux installer. Its `REFS` array must stay in sync with `skills/kermit/refs/` or a curl-piped install ships a broken skill
+- [kermit-merge-guard.sh](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/hooks/kermit-merge-guard.sh): the optional local hook that prompts for release notes on a merge to a protected branch
+
+## Optional
+
+- [RELEASES.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/RELEASES.md): user-facing release history — what kermit itself shipped, in plain language
+- [CHANGELOG.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/CHANGELOG.md): per-commit technical history, numbered and grouped by date
+- [SECURITY.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/SECURITY.md): how to report a vulnerability; scope
+- [LICENSE.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/LICENSE.md): MIT
