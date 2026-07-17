@@ -20,12 +20,14 @@
 <br />
 
 </div>
+<br />
 
 <p align="center">
   <a href="LICENSE.md"><img alt="license" src="https://badgen.net/badge/license/MIT/blue"></a>
   <img alt="modes" src="https://badgen.net/badge/modes/4/8B5CF6">
   <a href="https://github.com/ndisisnd/kermit/stargazers"><img alt="stars" src="https://badgen.net/github/stars/ndisisnd/kermit"></a>
 </p>
+
 
 <p align="center">
   <a href="#install">Install</a> ·
@@ -222,3 +224,7 @@ No. It's a local hook that prompts you to write release notes when a branch land
 
 - [rtk](https://github.com/rtk-ai/rtk) for token-optimized git commands. Saves lots of tokens
 - [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) for the open-sourced scaffold of commit messages
+
+---
+
+Dedicated to JC 🍙, who writes more commits than anyone I know.
