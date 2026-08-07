@@ -2,6 +2,22 @@
 
 What's new for you, release by release.
 
+## v3.1.0 — 2026-08-07
+
+> kermit now runs inside OpenAI Codex as well as Claude Code — same skill, same commands. Spawn it as a Codex subagent and it commits, changelogs and opens PRs entirely on its own, then hands back a machine-readable receipt.
+
+### ✨ New
+
+- Use kermit from OpenAI Codex. Install with `curl -fsSL .../install.sh | bash -s -- --codex` (or `--all` for both harnesses) and the same skill lands in Codex — nothing forked, nothing to keep in sync.
+- Let agents run kermit unattended. In a non-interactive run — a Codex subagent, or headless Claude — kermit never stops to ask: every approval takes its stated default, and the run's receipt says so.
+- Delegate commits to a kermit worker. A ready-to-copy subagent role file lets orchestrator agents hand commits, PRs and releases to kermit as the closing step of their workflows.
+- Read the outcome at a glance. Every run now ends with a small `kermit-result` receipt — what ran, the commit, the changelog entry, whether it pushed — so people and agents alike can verify what happened.
+
+### 📈 Improved
+
+- No network? No problem. If a sandboxed run can't push or publish, kermit finishes cleanly, keeps the commit and notes as the deliverable, and tells you the one command left to run.
+- First run in a fresh repo needs no setup when unattended: kermit bootstraps sensible defaults and keeps going — run `/kermit --init` any time to customise.
+
 ## v3.0.0 — 2026-07-17
 
 > Installing kermit now copies 88KB instead of 14MB, and `--release` finishes the whole release for you — notes, version bump, tag, and a published GitHub release. The separate `/log-it` command has folded into kermit as `/kermit --changelog-sync`, so there's one skill to install instead of two.
