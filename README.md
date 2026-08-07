@@ -45,6 +45,14 @@
 
 </div>
 
+<!-- mkpub:release v3.1.0 -->
+> [!NOTE]
+> **🚀 New in v3.1.0 · kermit now runs on OpenAI Codex too**
+>
+> The same skill installs into Codex (`--codex`) and runs unattended as a subagent — approvals take their stated defaults, and every run ends with a `kermit-result` receipt you can verify.
+> Update with `npx skills update kermit` · [Release notes](RELEASES.md)
+<!-- /mkpub:release -->
+
 ---
 
 <a id="install"></a>

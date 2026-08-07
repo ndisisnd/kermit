@@ -4,6 +4,10 @@ All notable changes to this project will be documented here.
 
 ## 2026-08-07
 
+### [37] — README header now announces v3.1.0 to existing users
+
+- `README.md`: Added — mkpub release blurb (GitHub NOTE alert) at the bottom of the header: one-line title, what v3.1.0 changes for current installs, update command and release-notes link
+
 ### [36] — kermit now runs on Codex: harness-neutral gates and a subagent worker contract
 
 - `skills/kermit/SKILL.md`: Added — harness resolution (`HARNESS` / `KERMIT_DIR` / `INTERACTIVE`), the `GATE(question, options, default)` contract, and the `kermit-result` closing block every mode now emits
