@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented here.
 
+## 2026-08-07
+
+### [36] — kermit now runs on Codex: harness-neutral gates and a subagent worker contract
+
+- `skills/kermit/SKILL.md`: Added — harness resolution (`HARNESS` / `KERMIT_DIR` / `INTERACTIVE`), the `GATE(question, options, default)` contract, and the `kermit-result` closing block every mode now emits
+- `skills/kermit/refs/protocol-*.md`, `changelog-*.md`: Changed — every `AskUserQuestion` site rewritten as `GATE(...)` with per-site non-interactive defaults; `.claude/kermit/` paths generalised to `$KERMIT_DIR`; push/publish steps tolerate no-network sandboxes (`pushed: failed` is a handled outcome)
+- `skills/kermit/refs/protocol-init.md`: Added — zero-question bootstrap so non-interactive runs on uninitialized repos write default prefs instead of interviewing; merge-to-main guard now branches per harness
+- `skills/kermit/refs/protocol-subagent.md`: Added — worker contract for orchestrators (preconditions, `kermit-result` shape, handled failure outcomes, AGENTS.md snippet)
+- `skills/kermit/agents/`: Added — `openai.yaml` Codex skill declaration and `kermit-agent.toml` ready-to-copy subagent role
+- `install.sh`, `bin/kermit.js`: Changed — `--codex` / `--all` install targets shipping the same skill body to `~/.agents/skills/kermit`
+- `README.md`, `llms.txt`, `SECURITY.md`: Changed — Codex install/usage docs and the non-interactive auto-gate policy (applies to Codex subagents and headless `claude -p` alike)
+- `.github/workflows/ci.yml`: Changed — existence and install-sync checks for the Codex adapter files
+
 ## 2026-07-17
 
 ### [35] — The README's default-flow walkthrough now opens with the kermit mark

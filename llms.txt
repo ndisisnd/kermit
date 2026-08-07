@@ -1,14 +1,17 @@
 # kermit
 
-> A Claude Code skill that writes Conventional Commits with emoji prefixes, and maintains a changelog, pull requests, and user-facing release notes alongside them.
+> An agent skill — for Claude Code and OpenAI Codex — that writes Conventional Commits with emoji prefixes, and maintains a changelog, pull requests, and user-facing release notes alongside them.
 
 kermit is prose, not code — the behavior lives in markdown protocols that an agent reads
 and follows, so changing what kermit *does* means editing a ref, not a source file. The
 `bin/` and `install.sh` scripts only install; the skill body itself is everything under
 `skills/kermit/`, and that is the only part that ships. `SKILL.md` is a router: it resolves
 the mode, then hands off to exactly one `refs/protocol-*.md` and follows it end to end. Two
-config files live under `.claude/kermit/` in the *user's* repo — `pref.json` (stable, safe
-to commit) and `state.json` (volatile, git-ignored); both are read once at mode-check.
+config files live under the resolved kermit dir in the *user's* repo — `pref.json` (stable,
+safe to commit) and `state.json` (volatile, git-ignored); both are read once at mode-check.
+The same body installs on both harnesses: `~/.claude/skills/kermit` for Claude Code,
+`~/.agents/skills/kermit` for Codex. Nothing is forked — harness differences resolve once
+per run, and the Codex-specific adapter files live under `skills/kermit/agents/`.
 
 ## Docs
 
@@ -25,8 +28,17 @@ to commit) and `state.json` (volatile, git-ignored); both are read once at mode-
 - [template-release.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/template-release.md): exact shape, section order, and voice rules for `RELEASES.md`. Read by protocol-release
 - [changelog-protocol.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/changelog-protocol.md): how a `CHANGELOG.md` entry is written and numbered. The single source of truth — protocol-commit and protocol-changelog-sync both defer to it
 - [changelog-reset.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/changelog-reset.md): `--changelog-reset` — renumber and normalise an existing changelog in place
-- [install.sh](https://raw.githubusercontent.com/ndisisnd/kermit/main/install.sh): macOS/Linux installer. Its `REFS` array must stay in sync with `skills/kermit/refs/` or a curl-piped install ships a broken skill
+- [install.sh](https://raw.githubusercontent.com/ndisisnd/kermit/main/install.sh): macOS/Linux installer, `--claude` (default) / `--codex` / `--all`. Its `REFS` and `AGENTS_FILES` arrays must stay in sync with `skills/kermit/refs/` and `skills/kermit/agents/` or a curl-piped install ships a broken skill
 - [kermit-merge-guard.sh](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/hooks/kermit-merge-guard.sh): the optional local hook that prompts for release notes on a merge to a protected branch
+
+## Codex
+
+- Install: `curl -fsSL https://raw.githubusercontent.com/ndisisnd/kermit/main/install.sh | bash -s -- --codex` → writes the skill to `~/.agents/skills/kermit` (Codex's user-level skill scope). `--all` installs for both harnesses
+- [protocol-subagent.md](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/refs/protocol-subagent.md): the worker contract — what an orchestrator must give a kermit subagent, what the `kermit-result` block returns, and the two failure shapes. Point a Codex plan step at this file
+- [openai.yaml](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/agents/openai.yaml): the Codex-side skill declaration that sits alongside `SKILL.md`
+- [kermit-agent.toml](https://raw.githubusercontent.com/ndisisnd/kermit/main/skills/kermit/agents/kermit-agent.toml): ready-to-copy Codex subagent role — copy to `.codex/agents/kermit.toml` in a repo to make kermit spawnable as a worker
+- AGENTS.md convention: the installer prints two lines to paste into a repo's `AGENTS.md` — delegate commits to kermit, and run `/kermit --release` before merging to main. The second is the Codex stand-in for the Claude merge-guard hook
+- Non-interactive rule: under `codex exec` or a spawned subagent, every gate resolves to its automatic answer regardless of `gate_mode`, and the run reports `gates: auto (non-interactive)`
 
 ## Optional
 

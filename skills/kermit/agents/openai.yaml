@@ -1,0 +1,22 @@
+# Codex-specific sidecar for the kermit skill.
+#
+# Optional by design: SKILL.md alone is enough for Codex to load kermit. This
+# file only adds Codex/ChatGPT-app surface metadata. Other harnesses (Claude
+# Code) ignore it, so the skill body stays single-source.
+#
+# Schema verified 2026-08-07 against:
+#   https://developers.openai.com/codex/skills
+#   (serves https://learn.chatgpt.com/docs/build-skills.md)
+# Keys are snake_case. Only the fields kermit actually needs are set.
+
+interface:
+  display_name: "kermit"
+  short_description: "Conventional-Commits committer with changelog and release notes."
+
+policy:
+  # Default is true. kermit stays implicitly invocable so "commit this" routes
+  # here without an explicit $kermit mention, matching Claude Code behaviour.
+  allow_implicit_invocation: true
+
+# No `dependencies:` block — kermit needs no MCP servers. It runs on plain
+# shell (git, gh, optional rtk), which every Codex sandbox already provides.
