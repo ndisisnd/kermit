@@ -32,6 +32,7 @@
 <p align="center">
   <a href="#install">Install</a> ·
   <a href="#how-it-works">How it works</a> ·
+  <a href="#codex">Codex</a> ·
   <a href="#faq">FAQ</a> ·
   <a href="llms.txt">llms.txt</a>
 </p>
@@ -51,7 +52,7 @@
 ## Get started in 30 seconds
 
 ### 1. Install the skill
-Installing gets you the `kermit` skill and its relevant references. On any platform — macOS, Linux, or Windows — paste this in your terminal:
+Installing gets you the `kermit` skill and its relevant references. kermit runs on **Claude Code and OpenAI Codex** from the same skill body — the instructions below install the Claude Code copy, and the [Codex](#codex) section covers the Codex one. On any platform — macOS, Linux, or Windows — paste this in your terminal:
 
 ```bash
 npx skills add ndisisnd/kermit -g
@@ -65,7 +66,7 @@ npx skills add ndisisnd/kermit -g
 curl -fsSL https://raw.githubusercontent.com/ndisisnd/kermit/main/install.sh | bash
 ```
 
-Either way, check it landed — you should see `SKILL.md`, `refs/`, and `hooks/`:
+Either way, check it landed — you should see `SKILL.md`, `refs/`, `hooks/`, and `agents/`:
 
 ```bash
 ls ~/.claude/skills/kermit
@@ -179,6 +180,61 @@ Once you approve the notes, kermit finishes the release for you: it bumps your `
 
 **Automatic prompt on merge to main.** A release is a formal moment — usually a branch landing on `main`. If you enable the **merge-to-main guard** during `--init`, kermit watches for a merge or push to `main` and reminds you to write release notes first, warning you if you skip them (so a release never ships silently). The guard is a local hook — it prompts, it never blocks your merge.
 
+<a id="codex"></a>
+
+## kermit on Codex
+
+kermit runs on OpenAI Codex from the **same skill body** as Claude Code — same `SKILL.md`, same protocols, same changelog conventions. There is no separate Codex edition to keep in step; only the install location and a couple of adapter files differ.
+
+### Install for Codex
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ndisisnd/kermit/main/install.sh | bash -s -- --codex
+```
+
+That writes the skill to `~/.agents/skills/kermit`, which is where Codex looks for your user-level skills. Use `--all` instead of `--codex` to install for both harnesses at once; with no flag you get the Claude Code install, exactly as before.
+
+Then run `/kermit --init` in a repo, the same as on Claude Code.
+
+### Using kermit from a Codex subagent
+
+kermit is built to be handed off to. An orchestrating agent finishes a change and delegates the commit rather than writing one itself. Two ways to do it:
+
+- **Spawn the kermit role.** Copy the shipped `~/.agents/skills/kermit/agents/kermit-agent.toml` into your repo as `.codex/agents/kermit.toml`. Codex can then spawn a `kermit` subagent, and you pass the mode in the task prompt (`default commit`, `--pr`, `--release`, `--changelog-sync`).
+- **Point a task at the skill.** A `codex exec` task that names the kermit skill works too, no role file needed.
+
+`refs/protocol-subagent.md` is the worker contract — what an orchestrator has to hand kermit, and what comes back. Point your plan step at that file.
+
+### Tell Codex to route commits through kermit
+
+Paste these two lines into your repo's `AGENTS.md`. kermit never writes into your `AGENTS.md` itself — the installer just prints them.
+
+```
+After completing a change, delegate the commit to the kermit skill / kermit subagent rather than committing ad hoc.
+Before merging or pushing to main/master, run `/kermit --release` (or spawn the kermit subagent in release mode) so the release ships user-facing notes.
+```
+
+The second line is the Codex equivalent of the merge-to-main guard. On Claude Code that guard is a local hook; on Codex it is a convention, because Codex hooks are still behind a beta feature flag. Either way it prompts, it never blocks.
+
+### Gates when nobody is watching
+
+A subagent has no human to answer a question, and `codex exec` errors out the moment something needs a fresh approval. So when kermit detects it is running non-interactively, **every gate resolves to its automatic answer** — approve, commit, and push all proceed without asking, whatever `gate_mode` says. Interactive runs are untouched: your `gate_mode` still governs them exactly as before. The same rule applies to headless Claude runs (`claude -p`). See [SECURITY.md](SECURITY.md) for why that is safe and where the real containment lives.
+
+### What a worker hands back
+
+Every run ends with a fenced `kermit-result` block, so an orchestrator can verify the work without parsing prose:
+
+```kermit-result
+mode: commit | pr | release | changelog-sync
+head: <sha or null>
+changelog_entry: <N or null>
+pushed: yes | no | failed
+published: yes | no | n/a
+gates: full | auto | auto (non-interactive)
+```
+
+`gates: auto (non-interactive)` is the flag that nothing was human-reviewed. `pushed: failed` means the sandbox had no network — the commit and changelog still landed, and kermit tells you the one command to push yourself.
+
 ## How to update
 
 If you installed with the skills CLI, update kermit by name:
@@ -193,7 +249,7 @@ If you used the install script, updating is that same line again:
 curl -fsSL https://raw.githubusercontent.com/ndisisnd/kermit/main/install.sh | bash
 ```
 
-The install script wipes `~/.claude/skills/kermit` before it writes, so refs retired or renamed in a newer version don't linger. Your settings are safe either way: they live in each project's `.claude/kermit/` directory, which neither path touches. That means you don't re-run `/kermit --init` after an update unless you want to change your answers.
+The install script wipes the skill directory it targets — `~/.claude/skills/kermit`, or `~/.agents/skills/kermit` when you pass `--codex` — before it writes, so refs retired or renamed in a newer version don't linger. Your settings are safe either way: they live in each project's own kermit directory, which neither path touches. That means you don't re-run `/kermit --init` after an update unless you want to change your answers.
 
 To bring files kermit already wrote up to the current conventions, run `/kermit --changelog-reset` — it renumbers and normalises an existing `CHANGELOG.md` in place, after a backup and a diff you approve.
 

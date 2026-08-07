@@ -12,10 +12,10 @@ The changelog groups entries **by date**. The newest date sits at the top of the
 
 Every entry carries a strictly increasing integer `N`, one per commit, newest entry at the top of the file with the highest `N`. Numbers never reset.
 
-- Get the next number from `last_number + 1` in `.claude/kermit/state.json`.
+- Get the next number from `last_number + 1` in `$KERMIT_DIR/state.json`.
 - If state is unavailable, derive it from the file: the highest existing `### [k]` heading + 1.
 - Starting value is `1` (so `last_number: 0` → first entry is `### [1]`).
-- After writing, set `last_number` in `.claude/kermit/state.json` to the highest `N` written.
+- After writing, set `last_number` in `$KERMIT_DIR/state.json` to the highest `N` written.
 
 ## Date grouping
 

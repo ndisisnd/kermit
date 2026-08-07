@@ -43,7 +43,9 @@ jobs:
 
       - name: Every refs/ pointer in SKILL.md must resolve
         # SKILL.md's ref pointers are relative to the skill dir, which is what ships —
-        # so resolve them from there, not from the repo root.
+        # so resolve them from there, not from the repo root. The list is derived from
+        # SKILL.md itself, so any new ref (e.g. refs/protocol-subagent.md) is covered
+        # automatically the moment SKILL.md points at it — no edit needed here.
         run: |
           cd skills/kermit
           missing=0
@@ -60,5 +62,23 @@ jobs:
           in_array=$(grep -oE '^REFS=\(.*\)' install.sh | grep -oE '[A-Za-z0-9._-]+\.md' | sort)
           if ! diff <(echo "$on_disk") <(echo "$in_array"); then
             echo "install.sh REFS array is out of sync with skills/kermit/refs/"
+            exit 1
+          fi
+
+      - name: Codex adapter files must exist and match install.sh AGENTS_FILES
+        # Same failure mode as REFS: a curl-piped install can't list the repo, so a
+        # Codex adapter file missing from the array (or from disk) ships a broken
+        # Codex install. Both files are required — openai.yaml is the skill
+        # declaration Codex reads, kermit-agent.toml is the subagent role.
+        run: |
+          missing=0
+          for f in skills/kermit/agents/openai.yaml skills/kermit/agents/kermit-agent.toml; do
+            if [ ! -f "$f" ]; then echo "missing Codex adapter file: $f"; missing=1; fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
+          on_disk=$(ls skills/kermit/agents | sort)
+          in_array=$(grep -oE '^AGENTS_FILES=\(.*\)' install.sh | grep -oE '[A-Za-z0-9._-]+\.(yaml|yml|toml)' | sort)
+          if ! diff <(echo "$on_disk") <(echo "$in_array"); then
+            echo "install.sh AGENTS_FILES array is out of sync with skills/kermit/agents/"
             exit 1
           fi
