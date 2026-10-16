@@ -81,7 +81,7 @@ ls ~/.claude/skills/kermit
 ```
 
 ### 2. Initialise kermit
-`kermit` can be used immediately, but initialising it would make the experience more seamless and personalised to your codebase + repository. Paste ```bash /kermit --init``` in your terminal. Initialising will run a step-by-step protocol that basically:
+`kermit` can be used immediately, but initialising it would make the experience more seamless and personalised to your codebase + repository. Paste ```bash /kermit --init``` in your terminal. Initialising will first ask whether to use the default settings or customise them. **Default settings** create a new `CHANGELOG.md` (an existing one is kept) and use `flash` mode, then finish in one step. **Customise** runs a step-by-step protocol that basically:
 
 1. Determines how you want to manage your changelog, personalised to your style
 2. Sets up your release notes (`RELEASES.md`) and, optionally, the merge-to-main guard
@@ -89,6 +89,8 @@ ls ~/.claude/skills/kermit
 4. Saves all your preferences in a JSON file that's used by future `/kermit` runs
 
 _If you already have a changelog, `kermit` will ask you to point to the relative path._
+
+_If you run any `/kermit` command before initialising, `kermit` runs setup first and then carries on with the command you asked for — you do not need to run it again._
 
 <a id="how-it-works"></a>
 

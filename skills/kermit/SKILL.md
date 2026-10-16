@@ -141,7 +141,7 @@ no network — add a one-line remediation after the block, do not error out.
 ### Mode check (runs after harness resolution, before everything else)
 
 - **`--changelog-reset`** → read `refs/changelog-reset.md`, follow it end-to-end, then **exit** — do not run the commit flow.
-- **Otherwise** → read `$KERMIT_DIR/pref.json` and `$KERMIT_DIR/state.json`. If pref is absent, create it with `{"initialized":false}`. If `initialized` is `false` **or** `--init` was passed: read `refs/protocol-init.md` and follow it end-to-end, then continue as it directs. Otherwise fall through to the protocol dispatch below.
+- **Otherwise** → read `$KERMIT_DIR/pref.json` and `$KERMIT_DIR/state.json`. If pref is absent, create it with `{"initialized":false}`. If `initialized` is `false` **or** `--init` was passed: read `refs/protocol-init.md` and follow it end-to-end. An un-initialized repo runs setup first and then **continues into the requested mode** via the protocol dispatch below — only an explicit `--init` exits after setup. Otherwise fall through to the protocol dispatch below.
   - **Legacy migration.** Older prefs kept the state fields inside `pref.json`. If `state.json` is absent, create it now — seed `last_logged_commit` from `pref.last_logged_commit`, `last_number` from `pref.changelog.last_number`, `last_released_number` to `0`, and `backfill` from `pref.backfill` (each defaulting to `null`/`0` when the legacy key is missing), then rewrite `pref.json` without those three keys and ensure `$KERMIT_DIR/state.json` is in `.gitignore` (`grep -qxF "$KERMIT_DIR/state.json" .gitignore 2>/dev/null || printf '%s\n' "$KERMIT_DIR/state.json" >> .gitignore`). Cache the migrated state for the run.
 
 ### Protocol dispatch
