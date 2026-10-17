@@ -27,10 +27,9 @@ staged diff, writes `CHANGELOG.md` and `RELEASES.md`, and runs `git` and `gh` co
 your behalf. It has no server, no network listener, and no credentials of its own — when
 it talks to GitHub it borrows the `gh` CLI auth you already set up.
 
-The realistic surface is therefore three things: the curl-piped installer
+The realistic surface is therefore two things: the curl-piped installer
 (`install.sh`) and what it writes into `~/.claude/skills/kermit` or `~/.agents/skills/kermit`,
-the merge-guard hook it can install into your repo, and the shell commands the protocols
-instruct an agent to run. Anything that could turn one of those into arbitrary code
+and the shell commands the protocols instruct an agent to run. Anything that could turn one of those into arbitrary code
 execution, or make kermit write outside the repo it was invoked in, is in scope.
 
 ## Non-interactive runs auto-approve kermit's own gates

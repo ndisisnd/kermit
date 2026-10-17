@@ -12,9 +12,9 @@ Shared by the zero-question bootstrap and the interactive "Use default settings"
 batched call:
 
 - Write `$KERMIT_DIR/pref.json`:
-  `{"initialized":true,"init_commit":"<HEAD sha or null>","changelog":{"path":"CHANGELOG.md","protocol":null},"release_guard":false,"gate_mode":"flash"}`
+  `{"initialized":true,"init_commit":"<HEAD sha or null>","changelog":{"path":"CHANGELOG.md","protocol":null},"gate_mode":"flash"}`
   — `CHANGELOG.md` at the repo root, the default changelog protocol
-  (`refs/changelog-protocol.md`), zero gates, no merge guard.
+  (`refs/changelog-protocol.md`), zero gates.
 - Create `CHANGELOG.md` with header
   `# Changelog\n\nAll notable changes to this project will be documented here.\n` if absent.
   An existing `CHANGELOG.md` is kept as-is, never overwritten.
@@ -23,11 +23,25 @@ batched call:
   and git-ignore it:
   `grep -qxF "$KERMIT_DIR/state.json" .gitignore 2>/dev/null || printf '%s\n' "$KERMIT_DIR/state.json" >> .gitignore`.
 
+## Legacy merge-guard cleanup (every init run)
+
+kermit up to v3.2.0 could install a merge-to-main reminder hook. v3.3.0 removed it and no
+longer ships the script, so a leftover hook entry errors on every Bash call. Run this on
+every init path — zero-question, default settings, and customise — before writing pref:
+
+- In `.claude/settings.json` and `.claude/settings.local.json` (skip a file that is absent),
+  delete every hook whose `command` contains `kermit-merge-guard.sh`. Then delete any
+  `PreToolUse` matcher block left with an empty `hooks` array, and a `PreToolUse` key left
+  empty. Leave every other hook and key exactly as it was. Do not touch a file with no match.
+- Drop a `release_guard` key from the existing `$KERMIT_DIR/pref.json` if present (the pref
+  writes below omit it anyway).
+- When a hook entry was removed, emit `Removed the retired kermit merge-guard hook from <file>.`
+
 ## Zero-question bootstrap (check this first)
 
 If `INTERACTIVE=false` **and** pref is missing or `initialized: false`, do **not** run the
-interview below — a non-interactive run has nobody to answer it. Run the **Default settings
-block**, emit `initialized by non-interactive bootstrap — run /kermit --init interactively to customise`,
+interview below — a non-interactive run has nobody to answer it. Run the **Legacy merge-guard
+cleanup**, then the **Default settings block**, emit `initialized by non-interactive bootstrap — run /kermit --init interactively to customise`,
 then **continue into the requested mode** (the Protocol dispatch in SKILL.md) — do not exit,
 even if `--init` was the flag that got you here.
 
@@ -35,7 +49,7 @@ Everything below is the interactive path.
 
 ---
 
-If `initialized` is `false` **or** `--init` was passed:
+If `initialized` is `false` **or** `--init` was passed, run the **Legacy merge-guard cleanup** first, then:
 1. **Defaults or customise.** `GATE(question: "How do you want to set up kermit?", options: ["Use default settings (new CHANGELOG.md, flash mode)", "Customise"], default: "Use default settings (new CHANGELOG.md, flash mode)")`.
    - **"Use default settings"**: run the **Default settings block**, emit `kermit set up with default settings — CHANGELOG.md, flash mode (0 gates). Run /kermit --init to customise.`, then skip steps 2–4 and go to **Finish**.
    - **"Customise"**: continue to step 2.
@@ -74,20 +88,17 @@ If `initialized` is `false` **or** `--init` was passed:
    for run gates; SKILL.md's Gate resolution derives the effective
    `auto_approve` / `auto_commit` / `auto_merge` / `push_enabled` values from it.
 
-4. **Release-notes setup.** kermit keeps user-facing release notes in `RELEASES.md`, separate from the technical `CHANGELOG.md`. Default `release_guard` to `false` and the initial `last_released_number` to `0`.
+4. **Release-notes setup.** kermit keeps user-facing release notes in `RELEASES.md`, separate from the technical `CHANGELOG.md`. Default the initial `last_released_number` to `0`.
    - **Scaffold the file.** If `RELEASES.md` does not exist, create it with header `# Releases\n\nWhat's new for you, release by release.\n` and emit `Release notes file created at RELEASES.md.` If it already exists, leave it untouched.
    - **Offer an inaugural note.** Only if the changelog already contains numbered entries (`grep -q '^## \[' <changelog>`) — i.e. there is release-worthy history to summarise — `GATE(question: "Draft an initial release note from your history?", options: ["Yes", "No"], default: "No")`. On `Yes`: follow `refs/protocol-release.md` steps 2–7 against the changelog to write the first `RELEASES.md` section (version defaults to `package.json` `version` if present, else `v1.0.0`); remember the highest changelog number it covered and use it as the initial `last_released_number` in the state write below. On `No` (or when the changelog has no numbered entries): leave `RELEASES.md` as the empty scaffold and keep `last_released_number: 0`.
-   - **Merge-to-main guard.** Branch on `HARNESS`:
-     - **`HARNESS=claude`** — `GATE(question: "Install the merge-to-main guard so kermit reminds you to write release notes before a release?", options: ["Yes", "No"], default: "No")`. On `Yes`: set `release_guard` to `true` and add a PreToolUse Bash hook to the project's `.claude/settings.json` running `"$HOME/.claude/skills/kermit/hooks/kermit-merge-guard.sh"` — **merge** into any existing `hooks` block, never clobbering other hooks (create `.claude/settings.json` with just this hook if it is absent). On `No`: keep `release_guard: false`.
-     - **`HARNESS=codex`** — Codex hooks are beta, so the guard ships as a convention, not a hook. Set `release_guard` to `true` (meaning "convention communicated") and print this snippet for the user to paste into their repo's `AGENTS.md`:
+   - **Codex routing line.** Only when `HARNESS=codex`: print this line for the user to paste into their repo's `AGENTS.md`:
        ```
        - After completing a change, delegate the commit to the kermit skill / kermit subagent rather than committing ad hoc.
-       - Before merging or pushing to main/master, run `/kermit --release` (or spawn the kermit subagent in release mode) so the release ships user-facing notes.
        ```
        Do not write into the user's `AGENTS.md` yourself — print it and let them paste.
 
    Write **two files** — kermit splits stable config from volatile runtime state so per-commit writes never dirty a tracked file:
-   - **Config** → `$KERMIT_DIR/pref.json`: `{"initialized":true,"init_commit":"<sha-or-null>","changelog":{"path":"<changelog-path-or-null>","protocol":<object-or-null>},"release_guard":<bool>,"gate_mode":"<full|auto|flash|commit-only>"}`. `changelog.path` is the changelog file located or created above (`--changelog-sync` reads it). `changelog.protocol` is the object set by the custom protocol sub-flow, or `null` when the default `refs/changelog-protocol.md` applies. `release_guard` is the merge-guard toggle set above. This file is safe to commit and share across a team.
+   - **Config** → `$KERMIT_DIR/pref.json`: `{"initialized":true,"init_commit":"<sha-or-null>","changelog":{"path":"<changelog-path-or-null>","protocol":<object-or-null>},"gate_mode":"<full|auto|flash|commit-only>"}`. `changelog.path` is the changelog file located or created above (`--changelog-sync` reads it). `changelog.protocol` is the object set by the custom protocol sub-flow, or `null` when the default `refs/changelog-protocol.md` applies. This file is safe to commit and share across a team.
    - **State** → `$KERMIT_DIR/state.json`: `{"last_logged_commit":null,"last_number":0,"last_released_number":<0-or-inaugural-N>,"backfill":"<done|skipped|null>"}`. `last_number` seeds the per-commit changelog counter at 0 (first entry becomes `[1]`); `last_released_number` seeds the release boundary (`0`, or the highest number an inaugural note covered); `backfill` is the value recorded in the backfill check. This file is rewritten on every commit and must **not** be tracked.
    - **Ignore the state file.** Ensure `$KERMIT_DIR/state.json` is git-ignored so those per-run writes stay out of the working tree: `grep -qxF "$KERMIT_DIR/state.json" .gitignore 2>/dev/null || printf '%s\n' "$KERMIT_DIR/state.json" >> .gitignore` (creates `.gitignore` if absent; the `grep -qxF` guard makes it idempotent). Do **not** ignore `pref.json`.
 

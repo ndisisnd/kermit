@@ -4,6 +4,17 @@ All notable changes to this project will be documented here.
 
 ## 2026-10-17
 
+### [39] — Release reminder on merge to main retired; `--init` cleans up the old hook
+
+- `skills/kermit/hooks/kermit-merge-guard.sh`: Removed — the merge-to-main reminder hook
+- `skills/kermit/refs/protocol-init.md`: Changed — guard question and `release_guard` dropped; new legacy cleanup removes any leftover `kermit-merge-guard.sh` hook from `.claude/settings*.json` on every init path
+- `skills/kermit/refs/protocol-release.md`: Changed — release mode is reached via `--release` only
+- `skills/kermit/refs/protocol-subagent.md`: Changed — Codex `AGENTS.md` snippet trimmed to the commit-routing line
+- `skills/kermit/SKILL.md`, `skills/kermit/pref.json`: Removed — `release_guard` pref key
+- `install.sh`, `bin/kermit.js`: Changed — no longer ship a `hooks/` dir; Codex snippet is one line
+- `.claude/settings.json`: Removed — merge-guard hook entry
+- `README.md`, `SECURITY.md`, `llms.txt`: Changed — guard docs, FAQ entry and hook references removed
+
 ### [38] — First-time setup offers one-step defaults and resumes your command; release notes get shorter and lead with breaking changes
 
 - `skills/kermit/refs/protocol-init.md`: Added — "defaults or customise" first step (new `CHANGELOG.md`, flash mode) sharing one default-settings block with the non-interactive bootstrap; a Finish section resumes the requested mode after setup, and only `--init` exits

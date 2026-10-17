@@ -16,7 +16,6 @@ SKILL_SRC="skills/kermit"
 # dir — a curl-piped install can't list the repo, so a missing entry ships a broken skill.
 # The same rule applies to AGENTS_FILES below and the repo's skills/kermit/agents/ dir.
 REFS=("protocol-init.md" "protocol-commit.md" "protocol-pr.md" "protocol-release.md" "protocol-changelog-sync.md" "protocol-subagent.md" "template-release.md" "changelog-protocol.md" "changelog-reset.md")
-HOOKS=("kermit-merge-guard.sh")              # shell hooks under hooks/
 AGENTS_FILES=("openai.yaml" "kermit-agent.toml")   # Codex adapter files under agents/
 
 # Which harness(es) to install for. --claude stays the default so existing
@@ -73,12 +72,6 @@ install_body() {
   for r in "${REFS[@]}"; do
     fetch "${SKILL_SRC}/refs/${r}" "${dest}/refs/${r}"
   done
-  # Hooks (e.g. the merge-to-main guard) live in hooks/ and must stay executable.
-  mkdir -p "${dest}/hooks"
-  for h in "${HOOKS[@]}"; do
-    fetch "${SKILL_SRC}/hooks/${h}" "${dest}/hooks/${h}"
-    chmod +x "${dest}/hooks/${h}" 2>/dev/null || true
-  done
   # Codex adapter files: the skill declaration Codex reads, and the ready-to-copy
   # subagent role. Shipped on both harnesses so one install can serve either.
   mkdir -p "${dest}/agents"
@@ -118,10 +111,9 @@ if [ "${INSTALL_CODEX}" -eq 1 ]; then
   echo "→ Tailor kermit to your needs by editing ${CODEX_SKILL_DIR}/SKILL.md."
   echo "→ Copy ${CODEX_SKILL_DIR}/agents/kermit-agent.toml to .codex/agents/kermit.toml in a repo to make kermit spawnable as a subagent."
   echo
-  echo "Add these two lines to your repo's AGENTS.md so Codex routes commits through kermit:"
+  echo "Add this line to your repo's AGENTS.md so Codex routes commits through kermit:"
   echo
   echo "  After completing a change, delegate the commit to the kermit skill / kermit subagent rather than committing ad hoc."
-  echo "  Before merging or pushing to main/master, run \`/kermit --release\` (or spawn the kermit subagent in release mode) so the release ships user-facing notes."
   echo
 fi
 

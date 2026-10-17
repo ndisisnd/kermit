@@ -49,12 +49,9 @@ All three terminate **successfully**. None should be retried blindly.
 
 ## AGENTS.md snippet for Codex repos
 
-Add these two lines to the repo's `AGENTS.md` so any Codex session finds kermit and honours
-the release guard:
+Add this line to the repo's `AGENTS.md` so any Codex session finds kermit:
 
 ```
 - After completing a change, delegate the commit to the kermit skill / kermit subagent
   rather than committing ad hoc.
-- Before merging or pushing to main/master, run `/kermit --release` (or spawn the kermit
-  subagent in release mode) so the release ships user-facing notes.
 ```
