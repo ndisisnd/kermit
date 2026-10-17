@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented here.
 
+## 2026-10-17
+
+### [38] — First-time setup offers one-step defaults and resumes your command; release notes get shorter and lead with breaking changes
+
+- `skills/kermit/refs/protocol-init.md`: Added — "defaults or customise" first step (new `CHANGELOG.md`, flash mode) sharing one default-settings block with the non-interactive bootstrap; a Finish section resumes the requested mode after setup, and only `--init` exits
+- `skills/kermit/SKILL.md`: Changed — mode check states that setup continues into the requested mode
+- `README.md`: Changed — documents the new first question and continue-after-setup behaviour
+- `skills/kermit/refs/template-release.md`: Changed — Breaking section moves first, bullets capped at one sentence of 20 words, blank-line spacing rule, exemplar shortened
+- `skills/kermit/refs/protocol-release.md`: Changed — rewrite step uses the new order and word limit; Highlight leads with any breaking change
+
 ## 2026-08-07
 
 ### [37] — README header now announces v3.1.0 to existing users

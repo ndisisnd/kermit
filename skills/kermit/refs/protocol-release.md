@@ -63,14 +63,14 @@ and skip the GitHub release if the user declines.
 
 4. **Rewrite and classify.** Read `refs/template-release.md` now for the exact shape, section
    order, labels, and voice rules. For each changelog entry in range, translate its technical
-   summary into a **user-facing** line and sort it into one bucket: `✨ New`, `📈 Improved`,
-   `🐛 Fixed`, `🔒 Security`, `⚠️ Breaking`, `🗑️ Deprecated`. Apply the voice rules: say what
+   summary into a **user-facing** line of 20 words or fewer and sort it into one bucket:
+   `⚠️ Breaking`, `✨ New`, `📈 Improved`, `🐛 Fixed`, `🔒 Security`, `🗑️ Deprecated`. Apply the voice rules: say what
    the user can now do / no longer needs to do / must do differently, and *why* — no file
    names, no jargon, second person. Collapse changes with no user-visible effect into at most
    one "under the hood" line under Improved, or drop them.
 
-5. **Write the Highlight.** A 1–3 sentence blockquote leading with the release's single most
-   material change — the thing a user would care about most.
+5. **Write the Highlight.** A 1–3 sentence blockquote leading with the breaking change if the
+   release has one, else the release's single most material change.
 
 6. **Compose and prepend.** Render the release section per the template — the `## <version> —
    <date>` heading, the Highlight blockquote, then only the non-empty `###` sections in fixed
