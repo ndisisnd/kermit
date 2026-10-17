@@ -54,19 +54,6 @@ for (const DEST of targets) {
   const agentsDir = path.join(SRC, 'agents');
   if (fs.existsSync(agentsDir)) copyDir(agentsDir, path.join(DEST, 'agents'));
 
-  // Ship the hooks/ dir (e.g. the merge-to-main guard) and keep the scripts executable.
-  const hooksDir = path.join(SRC, 'hooks');
-  if (fs.existsSync(hooksDir)) {
-    const destHooks = path.join(DEST, 'hooks');
-    fs.mkdirSync(destHooks, { recursive: true });
-    for (const entry of fs.readdirSync(hooksDir, { withFileTypes: true })) {
-      if (!entry.isFile()) continue;
-      const to = path.join(destHooks, entry.name);
-      fs.copyFileSync(path.join(hooksDir, entry.name), to);
-      if (entry.name.endsWith('.sh')) { try { fs.chmodSync(to, 0o755); } catch {} }
-    }
-  }
-
   // pref.json (config) and state.json (volatile runtime state) ship as templates.
   for (const tmpl of ['pref.json', 'state.json']) {
     const src = path.join(SRC, tmpl);

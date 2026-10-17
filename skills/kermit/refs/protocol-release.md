@@ -1,6 +1,6 @@
 # Release protocol
 
-Reached via `--release`, or when the merge-to-main guard prompts a release. This mode writes
+Reached via `--release`. This mode writes
 and maintains **release notes** — the user-facing story of what changed, in `RELEASES.md` —
 then commits them and publishes a GitHub release. It does **not** create a commit for your
 *code*; it operates on committed history. Run the default commit flow first (`/kermit`) if you

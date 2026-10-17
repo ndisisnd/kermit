@@ -62,7 +62,7 @@ Four protocol modes, each in its own ref:
 - **Changelog-sync** — `refs/protocol-changelog-sync.md`: backfill changelog entries for commits that landed without one.
 
 kermit keeps two files under the resolved `KERMIT_DIR` (see **Harness resolution**): **`pref.json`** holds stable config
-(`initialized`, `init_commit`, `changelog.*`, `release_guard`, `gate_mode`) and is safe to
+(`initialized`, `init_commit`, `changelog.*`, `gate_mode`) and is safe to
 commit; **`state.json`** holds volatile runtime state (`last_logged_commit`, `last_number`,
 `last_released_number`, `backfill`) that is rewritten on every commit and must stay git-ignored. Both are read
 **once** at the mode-check step below — cache their values for the rest of the run rather

@@ -74,7 +74,7 @@ npx skills add ndisisnd/kermit -g
 curl -fsSL https://raw.githubusercontent.com/ndisisnd/kermit/main/install.sh | bash
 ```
 
-Either way, check it landed — you should see `SKILL.md`, `refs/`, `hooks/`, and `agents/`:
+Either way, check it landed — you should see `SKILL.md`, `refs/`, and `agents/`:
 
 ```bash
 ls ~/.claude/skills/kermit
@@ -84,7 +84,7 @@ ls ~/.claude/skills/kermit
 `kermit` can be used immediately, but initialising it would make the experience more seamless and personalised to your codebase + repository. Paste ```bash /kermit --init``` in your terminal. Initialising will first ask whether to use the default settings or customise them. **Default settings** create a new `CHANGELOG.md` (an existing one is kept) and use `flash` mode, then finish in one step. **Customise** runs a step-by-step protocol that basically:
 
 1. Determines how you want to manage your changelog, personalised to your style
-2. Sets up your release notes (`RELEASES.md`) and, optionally, the merge-to-main guard
+2. Sets up your release notes (`RELEASES.md`)
 3. Determines how you want to gate your commits (e.g. auto-commit, auto-approve, or even commit to push immediately)
 4. Saves all your preferences in a JSON file that's used by future `/kermit` runs
 
@@ -188,8 +188,6 @@ The notes focus on you, not the diff — what you can now do, what changed for y
 
 Once you approve the notes, kermit finishes the release for you: it bumps your `package.json` version, commits both files as `🔖 chore(release): vX.Y.Z`, pushes, and publishes a tagged GitHub release with those same notes as the body. The release commit deliberately gets no changelog entry — it's bookkeeping, not a change your users need to read about next time. Each step follows your gate mode, so `full` asks before committing and before publishing, while `flash` does the lot. Publishing needs the GitHub CLI authenticated (`gh auth login`); without it, kermit still writes and commits the notes and tells you the one command to publish yourself.
 
-**Automatic prompt on merge to main.** A release is a formal moment — usually a branch landing on `main`. If you enable the **merge-to-main guard** during `--init`, kermit watches for a merge or push to `main` and reminds you to write release notes first, warning you if you skip them (so a release never ships silently). The guard is a local hook — it prompts, it never blocks your merge.
-
 <a id="codex"></a>
 
 ## kermit on Codex
@@ -217,14 +215,11 @@ kermit is built to be handed off to. An orchestrating agent finishes a change an
 
 ### Tell Codex to route commits through kermit
 
-Paste these two lines into your repo's `AGENTS.md`. kermit never writes into your `AGENTS.md` itself — the installer just prints them.
+Paste this line into your repo's `AGENTS.md`. kermit never writes into your `AGENTS.md` itself — the installer just prints it.
 
 ```
 After completing a change, delegate the commit to the kermit skill / kermit subagent rather than committing ad hoc.
-Before merging or pushing to main/master, run `/kermit --release` (or spawn the kermit subagent in release mode) so the release ships user-facing notes.
 ```
-
-The second line is the Codex equivalent of the merge-to-main guard. On Claude Code that guard is a local hook; on Codex it is a convention, because Codex hooks are still behind a beta feature flag. Either way it prompts, it never blocks.
 
 ### Gates when nobody is watching
 
@@ -278,9 +273,6 @@ That's your choice, set once during `--init` and reused by every mode. The gate 
 
 **I already have a changelog. Will it get overwritten?**
 No. `--init` asks you to point at the existing file rather than replacing it. If you want it reformatted to kermit's conventions, `--changelog-reset` is the explicit way — and it backs up to `CHANGELOG.md.bak` and shows you a diff before writing anything.
-
-**Does the merge-to-main guard block my merge?**
-No. It's a local hook that prompts you to write release notes when a branch lands on a protected branch, and warns you if you skip. It never blocks the merge itself.
 
 ## License
 
