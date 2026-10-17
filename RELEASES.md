@@ -2,6 +2,15 @@
 
 What's new for you, release by release.
 
+## v3.3.0 — 2026-10-17
+
+> kermit no longer interrupts merges to main with a release-notes reminder. Run `/kermit --release` whenever you want notes.
+
+### 📈 Improved
+
+- Merging to main no longer triggers a release-notes reminder, so merges stay uninterrupted.
+- Setup now removes the old reminder for you, so upgrading never leaves a broken hook behind.
+
 ## v3.2.0 — 2026-10-17
 
 > Setting up kermit now takes one question, and your first command keeps going once setup ends.
