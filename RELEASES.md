@@ -2,6 +2,19 @@
 
 What's new for you, release by release.
 
+## v3.2.0 — 2026-10-17
+
+> Setting up kermit now takes one question, and your first command keeps going once setup ends.
+
+### ✨ New
+
+- Set up kermit in one step with default settings: a new changelog and no approval prompts.
+
+### 📈 Improved
+
+- Your first kermit command finishes after setup, so you never need to run it twice.
+- Release notes are shorter and list breaking changes first, so you see required actions sooner.
+
 ## v3.1.0 — 2026-08-07
 
 > kermit now runs inside OpenAI Codex as well as Claude Code — same skill, same commands. Spawn it as a Codex subagent and it commits, changelogs and opens PRs entirely on its own, then hands back a machine-readable receipt.
